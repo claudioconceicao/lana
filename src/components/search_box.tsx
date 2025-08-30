@@ -40,7 +40,7 @@ export default function SearchBox() {
   }, []);
 
   return (
-    <div className="w-full max-w-5xl">
+    <div className="w-full max-w-5xl border border-gray-200 rounded-xl shadow-md bg-white">
       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 md:gap-0 p-4 md:p-2 bg-white rounded-lg shadow-lg">
         {/* Location */}
         <div

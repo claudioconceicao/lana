@@ -18,7 +18,6 @@ const Navbar = () => {
   const [openLanguageDialog, setOpenDialog] = useState(false);
   const router = useRouter();
   const supabase = createClient();
-
   const [drawerKey, setDrawerKey] = useState(0); // force re-render of drawer
 
   useEffect(() => {

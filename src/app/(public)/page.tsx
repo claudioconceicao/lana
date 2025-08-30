@@ -14,7 +14,6 @@ import { BiTimeFive } from "react-icons/bi";
 import { FaShieldAlt } from "react-icons/fa";
 import { FaHome } from "react-icons/fa";
 
-
 export default function Home() {
   const router = useRouter();
   const { loading } = useSession();
@@ -58,13 +57,14 @@ export default function Home() {
       <HeroSection />
 
       {/* Top destination banners */}
-      <div className="mx-4 md:mx-12 lg:mx-36 mt-16 space-y-1 lg:w-[500px] md:w-[400px] w-full text-wrap">
-        <h1 className="font-heading text-black lg:text-4xl md:text-2xl text-xl font-semibold text-pretty">
+      <div className="mx-4 md:mx-12 lg:mx-36 mt-16 space-y-3 break-words w-full text-pretty">
+        <h1 className="font-heading text-black lg:text-4xl md:text-3xl text-2xl font-semibold leading-snug">
           Um mundo cheio de escolhas
         </h1>
-        <p className="font-sans text-black line-clamp-5">
-          De um apartamento para passar a noite para uma vivenda para passar o
-          fim de semana, tem sempre uma Beeva para toda ocasião.
+        <p className="font-sans text-gray-700 text-base leading-relaxed text-pretty break-words w-[650px]">
+          De um apartamento acolhedor para uma noite até uma vivenda espaçosa
+          para o fim de semana — com a Beeva, há sempre a opção ideal para cada
+          ocasião.
         </p>
       </div>
 
@@ -98,14 +98,14 @@ export default function Home() {
 
       {/* Home types */}
       <div className="mx-4 md:mx-12 lg:mx-36 mt-16 text-pretty">
-        <div className="lg:w-[600px] md:w-[500px] w-full text-wrap">
-          <h1 className="lg:text-4xl md:text-2xl text-xl font-semibold text-pretty">
+        <div className="lg:w-[600px] md:w-[500px] w-full">
+          <h1 className="lg:text-4xl md:text-2xl text-xl font-semibold">
             Encontre os melhores aluguéis de casas para uma estadia incrível
           </h1>
-          <p className="line-clamp-3">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempora
-            quod impedit dolorem esse ratione tempore voluptatum provident
-            ducimus accusantium adipisci.
+          <p className="mt-3 text-gray-600">
+            Na Beeva, acreditamos que viajar deve ser simples e prazeroso.
+            Descubra casas únicas, reserve em minutos e sinta-se em casa em
+            qualquer lugar.
           </p>
         </div>
 
@@ -129,7 +129,6 @@ export default function Home() {
           </ul>
         </div>
 
-        {/* Listings */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10 justify-center items-center w-full">
           {[0, 1, 2, 4, 5].map((number) => (
             <ListingCard listing={null} key={number} />
@@ -150,15 +149,28 @@ export default function Home() {
       {/* Why Choose Beeva Section */}
       <div className="px-4 md:px-12 lg:px-36 py-16 bg-gray-100 text-gray-900 flex flex-col justify-center items-center rounded-lg mt-12">
         <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center">
-          Por que escolher Beeva?
+          “Por que escolher a Beeva para a sua estadia?”
         </h2>
         <p className="text-lg md:text-xl text-center max-w-4xl mb-10">
-          Nossa missão é tornar sua estadia inesquecível. Com a Beeva, você
-          desfruta de segurança, conforto e experiências únicas.
+          Na Beeva, acreditamos que viajar deve ser simples e agradável.
+          Estadias rápidas, seguras e confortáveis — para que se sinta em casa
+          em qualquer lugar.”{" "}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
           {[
+            {
+              title: "Reserva rápida e simples",
+              description:
+                "Encontre e reserve o seu alojamento em poucos cliques.",
+              icon: <FaShieldAlt size={28} />,
+            },
+            {
+              title: "Acomodações verificadas",
+              description:
+                "Todas as casas são avaliadas para garantir qualidade e conforto.",
+              icon: <FaShieldAlt size={28} />,
+            },
             {
               title: "Segurança Garantida",
               description:
@@ -166,7 +178,7 @@ export default function Home() {
               icon: <FaShieldAlt size={28} />,
             },
             {
-              title: "Variedade de Opções",
+              title: "Flexibilidade e Variedade",
               description:
                 "Oferecemos desde casas na praia até apartamentos no centro, adaptando-se a todos os gostos e orçamentos.",
               icon: <FaHome size={28} />,
@@ -196,9 +208,7 @@ export default function Home() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6, delay: idx * 0.2 }}
             >
-              <div className="relative w-16 h-16 mb-4">
-                {card.icon}
-              </div>
+              <div className="relative w-16 h-16 mb-4">{card.icon}</div>
               <h3 className="font-semibold text-xl mb-2">{card.title}</h3>
               <p>{card.description}</p>
             </motion.div>

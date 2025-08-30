@@ -29,7 +29,7 @@ const PersonalInformation = () => {
   };
 
   return (
-    <div className="flex flex-col w-full h-full p-8  bg-white rounded-lg shadow-md">
+    <div className="flex flex-col h-full  bg-white">
       <h1 className="text-2xl font-semibold mb-4">Informação Pessoal</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-row justify-start gap-4">

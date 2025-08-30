@@ -14,7 +14,7 @@ type Listing = {
   };
 };
 
-export default function ListingCard({ listing }: { listing: any }) {
+export default function ListingCard({ listing }: { listing: Listing | null }) {
   const router = useRouter();
   const [liked, setLiked] = useState(false);
 

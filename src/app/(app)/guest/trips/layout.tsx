@@ -7,7 +7,7 @@ export default function TripsLayout({
 }) {
   return (
     <div className="flex">
-      <div className="w-full h-full border border-gray-300 mx-[50px]  mt-[30px] px-[50px] py-[60px]">
+      <div className="w-full h-full border border-gray-300 mx-[50px]  mt-[30px] px-[50px] py-8">
         <h1 className=" text-3xl font-semibold">Viagens</h1>
         <TripsNav />
         <main>{children}</main>

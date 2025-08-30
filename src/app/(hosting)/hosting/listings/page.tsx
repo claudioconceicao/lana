@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
+import { IoMdAdd } from "react-icons/io";
 import { useRouter, useSearchParams } from "next/navigation";
 import CreateHouse from "../new-listing/page";
 
@@ -48,9 +49,9 @@ const ListingList = () => {
         <h1 className="text-2xl md:text-3xl font-semibold">Seus Anúncios</h1>
         <button
           onClick={() => router.push("?modal=new")}
-          className="bg-gray-100 hover:bg-gray-200 shadow-md rounded-full w-10 h-10 flex items-center justify-center text-lg cursor-pointer"
+          className="bg-gray-100/30 shadow hover:shadow-lg rounded-full w-12 h-12 flex items-center justify-center"
         >
-          +
+          <IoMdAdd />
         </button>
       </div>
 

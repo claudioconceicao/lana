@@ -33,7 +33,7 @@ const CustomFooter = () => {
   };
 
   return (
-    <footer className="bg-gray-100 text-black py-12 px-6">
+    <footer className="sticky bg-gray-100 text-black py-12 px-6">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12">
         {/* Left side */}
         <div className="flex flex-col md:flex-row md:space-x-16 space-y-8 md:space-y-0">

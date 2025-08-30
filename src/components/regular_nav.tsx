@@ -29,7 +29,7 @@ const RegularNav = () => {
   const shadowList = ['/trips', '/guest/messages']
   const hasShadow = `${shadowList.includes(pathname) ? "shadow-md" : ""}`;
   return (
-    <nav className={`${hasShadow} w-full m-0 min-h-[60px] bg-white px-8 top-0 z-50  `}>
+    <nav className={`${hasShadow} sticky w-full m-0 min-h-[60px] bg-white px-8 top-0 z-50  `}>
       <div className="flex flex-row items-center h-full justify-between">
         <div className="left-0 h-full flex items-center">
           <Link href="/">

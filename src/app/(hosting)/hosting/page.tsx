@@ -1,7 +1,7 @@
 "use client";
 
 import ReservationCard from "@/components/reseveration-card";
-import { PlusIcon } from "lucide-react";
+import { IoMdAdd } from "react-icons/io";
 import Link from "next/link";
 import { useState } from "react";
 import { FaHeadset, FaStar } from "react-icons/fa";
@@ -27,8 +27,8 @@ export default function HomeHosting(){
       {/* Greeting + Create Listing */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
         <h3 className="font-semibold text-3xl">Olá, Admin!</h3>
-        <button className="flex flex-row gap-2 border shadow items-center justify-center p-2 rounded-lg hover:shadow-md">
-          <PlusIcon className="w-4 h-4" />
+        <button className="flex flex-row gap-2 shadow items-center justify-center p-2 rounded-lg hover:shadow-md">
+          <IoMdAdd className="w-4 h-4" />
           <span>Criar Anúncio</span>
         </button>
       </div>

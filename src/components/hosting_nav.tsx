@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { IoIosNotifications } from "react-icons/io";
 import CustomDrawer from "./custom_drawer";
 import LinkMenuBtn from "./link_menu_btn";
+import { useSession } from "@/context/SessionContext";
 
 const HostingNav = () => {
   const navLinks = [
@@ -18,11 +19,14 @@ const HostingNav = () => {
     { name: "Finanças", href: "/hosting/transactions-history" },
   ];
   const pathname = usePathname();
+
+  const {profile} = useSession();
+
   return (
     <nav className="w-full min-h-[60px] bg-white px-8 shadow-sm sticky top-0 z-50">
       <div className="flex flex-row items-center justify-between h-full w-full">
         <div className="h-full flex items-center">
-          <Link href="/">
+          <Link href="/hosting">
             <Image
               priority
               src={logo}
@@ -64,29 +68,12 @@ const HostingNav = () => {
           <CustomDrawer isScrolled={true}>
             <div className="p-6 space-y-6">
               <div>
-                <h2 className="font-normal mb-2 text-gray-500 uppercase text-xs tracking-wide">
-                  Viagens
-                </h2>
-                <ul className="space-y-2 text-2xl">
-                  <li>
-                    <LinkMenuBtn href="/guest/trips" title="Viagens" />
-                  </li>
-                  <li>
-                    <LinkMenuBtn href="/guest/favourites" title="Favoritos" />
-                  </li>
-                  <li>
-                    <LinkMenuBtn href="/guest/messages" title="Mensagens" />
-                  </li>
-                </ul>
-              </div>
-              <hr />
-              <div>
-                <h2 className="font-normal text-gray-500 uppercase text-xs">
-                  Hospedagem
-                </h2>
                 <ul className="space-y-1 text-2xl font-normal">
                   <li>
-                    <LinkMenuBtn href="/hosting" title="Vou hospedar" />
+                    <LinkMenuBtn href={`/profile/${profile.id}`} title="Perfil" />
+                  </li>
+                  <li>
+                    <LinkMenuBtn href="/" title="Vou viajar" />
                   </li>
                 </ul>
               </div>
