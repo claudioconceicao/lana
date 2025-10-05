@@ -22,7 +22,7 @@ export default function TripsNav() {
               ${
                 isActive
                   ? "text-black border-black"
-                  : "text-gray-400 border-transparent hover:border-black"
+                  : "text-gray-400 border-transparent hover:text-black "
               }`}
           >
             {tab.name}

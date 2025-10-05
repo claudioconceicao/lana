@@ -4,17 +4,8 @@ import { useRouter } from "next/navigation";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useState } from "react";
 
-type Listing = {
-  listing_id: string;
-  title: string;
-  location: string;
-  price: number;
-  rating: {
-    rating: number;
-  };
-};
 
-export default function ListingCard({ listing }: { listing: Listing | null }) {
+export default function ListingCard({ listing }: { listing: any }) {
   const router = useRouter();
   const [liked, setLiked] = useState(false);
 
@@ -28,17 +19,28 @@ export default function ListingCard({ listing }: { listing: Listing | null }) {
   ];
 
   const toggleLike = (e: React.MouseEvent) => {
-    e.stopPropagation(); // ✅ prevent navigating when clicking the heart
+    e.stopPropagation(); // prevent navigating when clicking the heart
     setLiked((prev) => !prev);
   };
 
+  // Safely get all reviews
+  const reviews =
+    listing?.bookings?.flatMap(
+      (b: { reviews?: { rating: number }[] }) => b.reviews ?? []
+    ) ?? [];
+
+  const avgRating =
+    reviews.length > 0
+      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+      : "N/A";
+
   return (
-    <div className="w-full sm:max-w-sm rounded-xl bg-white overflow-hidden  transition">
-      {/* Image Carousel (now bigger) */}
+    <div className="w-full sm:max-w-sm rounded-xl bg-white overflow-hidden transition">
+      {/* Image Carousel */}
       <div
-        className="w-full h-64 cursor-pointer" // 👈 taller image section
+        className="w-full h-64 cursor-pointer"
         onClick={() =>
-          router.push(`/homes/${listing ? listing.listing_id : 0}`)
+          router.push(`/homes/${listing?.listing_id ?? 0}`)
         }
       >
         <ImageCarousel images={images} />
@@ -48,7 +50,7 @@ export default function ListingCard({ listing }: { listing: Listing | null }) {
       <div
         className="py-3 flex flex-col gap-2 cursor-pointer"
         onClick={() =>
-          router.push(`/homes/${listing ? listing.listing_id : 0}`)
+          router.push(`/homes/${listing?.listing_id ?? 0}`)
         }
       >
         {/* Heading + Location */}
@@ -61,10 +63,7 @@ export default function ListingCard({ listing }: { listing: Listing | null }) {
               {listing?.location || "Localização"}
             </p>
           </div>
-          <button
-            onClick={toggleLike}
-            className="rounded-full p-2"
-          >
+          <button onClick={toggleLike} className="rounded-full p-2">
             {liked ? (
               <FaHeart className="text-red-500 w-5 h-5" />
             ) : (
@@ -77,7 +76,7 @@ export default function ListingCard({ listing }: { listing: Listing | null }) {
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center gap-1 text-yellow-500 text-sm">
             <FaStar className="w-4 h-4" />
-            <span>{listing?.rating.rating || "4.9"}</span>
+            <span>{avgRating}</span>
           </div>
           <p className="font-medium text-gray-900 text-sm">
             {listing?.price || "5000"}{" "}

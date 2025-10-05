@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import Image from "next/image";
 
 const reservationsData = [
@@ -24,10 +25,11 @@ const reservationsData = [
     status: "Pendente",
     price: "3000 Kz",
   },
-  // add more reservations
 ];
 
 const Reservations = () => {
+  const [selectedRes, setSelectedRes] = useState<any | null>(null);
+
   const filters = ["Todas", "Próximas", "Canceladas", "Concluídas", "Pendentes"];
 
   return (
@@ -62,6 +64,7 @@ const Reservations = () => {
             {reservationsData.map((res) => (
               <tr
                 key={res.id}
+                onClick={() => setSelectedRes(res)}
                 className="cursor-pointer hover:bg-gray-100 h-20"
               >
                 <td className="border-b border-gray-200 py-2">
@@ -110,7 +113,8 @@ const Reservations = () => {
         {reservationsData.map((res) => (
           <div
             key={res.id}
-            className="bg-white rounded-lg shadow p-4 flex flex-col gap-2"
+            onClick={() => setSelectedRes(res)}
+            className="bg-white rounded-lg shadow p-4 flex flex-col gap-2 cursor-pointer"
           >
             <div className="flex justify-between items-center">
               <span className="font-semibold">{res.listing}</span>
@@ -133,6 +137,55 @@ const Reservations = () => {
           </div>
         ))}
       </div>
+
+      {/* Modal */}
+      {selectedRes && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-lg max-w-lg w-full p-6 relative">
+            <button
+              onClick={() => setSelectedRes(null)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-semibold mb-4">
+              {selectedRes.listing}
+            </h2>
+            <div className="flex flex-col gap-2 text-sm text-gray-700">
+              <p>
+                <strong>Datas:</strong> {selectedRes.startDate} até{" "}
+                {selectedRes.endDate}
+              </p>
+              <p>
+                <strong>Hóspede:</strong> {selectedRes.guest} (
+                {selectedRes.guestsCount} pessoas)
+              </p>
+              <p>
+                <strong>Referência:</strong> {selectedRes.reference}
+              </p>
+              <p>
+                <strong>Status:</strong> {selectedRes.status}
+              </p>
+              <p>
+                <strong>Total pago:</strong> {selectedRes.price}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 mt-6">
+              <button className="px-4 py-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 text-sm">
+                Cancelar
+              </button>
+              <button className="px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 text-sm">
+                Mensagem
+              </button>
+              <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
+                Ver recibo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

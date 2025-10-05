@@ -2,47 +2,49 @@
 
 import { HeartIcon } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
 
-const BookingPanel = () => {
+interface BookingPanelProps {
+  listing_id: string;
+  listing_price: number;
+}
 
- const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-
-    const onScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+const BookingPanel = ({ listing_id, listing_price = 0 }: BookingPanelProps) => {
   return (
-    <div  id="booking-panel" >
-      <section className={`${scrollY > 500 ? "fixed top-[80] right-[150]" : "sticky top-[80] right-[150]"} 
-       ${scrollY > 800 ? "sticky right-[150]" : "sticky right-[150]"}} transition-all transition-discrete duration-300 ease-in-out bg-white shadow-md p-4 rounded-lg z-0`}>
-        <form action="GET">
-          <div className="flex justify-between items-center">
-            <h2>Adiciona datas para ver o preço</h2>
-            <div>
-              <Link href={"#"}>
-                <HeartIcon />
-              </Link>
-            </div>
-          </div>
-          <div className="flex flex-row  gap-4 mt-4">
-            <button className="flex-1 border border-gray-200 p-3 rounded-full">
-              Adicionar datas
-            </button>
-            <button className="flex-1 border border-gray-200 p-3 rounded-full">
-              1 Convidado
+    <div id="booking-panel" className="relative w-full">
+      <section
+        className="max-h-[calc(100vh-5rem)] overflow-y-auto sticky top-20 w-full flex flex-col gap-4 bg-white shadow-md p-4 border border-gray-200 rounded-lg z-20"
+      >
+        <div className="flex justify-between items-center">
+          <h2 className="font-semibold">AOA {listing_price}.00</h2>
+          <div>
+            <button type="button">
+              <HeartIcon />
             </button>
           </div>
-          <div className={`hidden`}></div>
-          <button className="w-full flex-1 bg-orange-300 p-4 rounded-lg mt-4">
-            Verificar disponibilidade
+        </div>
+
+        <div className="flex flex-row gap-2">
+          <button
+            className="flex-1 border border-gray-200 p-3 rounded-full"
+          >
+            Adicionar datas
           </button>
-        </form>
+          <button
+            className="flex-1 border border-gray-200 p-3 rounded-full"
+          >
+            1 Convidado
+          </button>
+        </div>
+
+        {/* payment summary placeholder */}
+        {/* add conditional UI when dates are set */}
+        
+        <Link
+          href={`/homes/${listing_id}/book/`}
+          className="w-full flex-1 text-center font-semibold bg-orange-300 p-4 rounded-lg"
+        >
+          Verificar disponibilidade
+        </Link>
       </section>
     </div>
   );

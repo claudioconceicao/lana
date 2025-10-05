@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, ReactNode } from "react";
 import logo from "../../../../../public/logo.svg";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,6 +7,8 @@ import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { XMarkIcon } from "@heroicons/react/24/solid";
+import clsx from "clsx";
+import { createClient } from "../../../../../utils/supabase/client";
 
 const Message = dynamic(() => import("./steps/message"), { ssr: false });
 const StepOne = dynamic(() => import("./steps/step-one"), { ssr: false });
@@ -25,19 +28,13 @@ export default function CreateHouse({
   onFinish,
 }: {
   onClose: () => void;
-  onFinish: (newHouse: {
-    id: number;
-    title: string;
-    description: string;
-    status: "Activo" | "Inactivo";
-    location: string;
-    image: string;
-  }) => void;
+  onFinish: (newHouse: any) => void;
 }) {
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(0); // 1 = next, -1 = back
+  const [loading, setLoading] = useState(false);
 
-  // Local state for form fields
+  // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [houseType, setHouseType] = useState("");
@@ -47,7 +44,7 @@ export default function CreateHouse({
     beds: 0,
     bathrooms: 0,
   });
-  const [price, setPrice] = useState(0.0);
+  const [price, setPrice] = useState(0);
   const [amenities, setAmenities] = useState<string[]>([]);
   const [address, setAddress] = useState({
     street: "",
@@ -58,13 +55,40 @@ export default function CreateHouse({
 
   const resetForm = () => {
     setStep(0);
+    setDirection(0);
     setTitle("");
     setDescription("");
     setHouseType("");
+    setAccommodationInfo({ guests: 0, bedrooms: 0, beds: 0, bathrooms: 0 });
     setPrice(0);
+    setAmenities([]);
+    setAddress({ street: "", city: "", postalCode: "", country: "" });
   };
 
-  // Steps array
+  const supabase = createClient();
+  const isStepValid = () => {
+    switch (step) {
+      case 1:
+        return title.trim().length > 0;
+      case 2:
+        return description.trim().length > 0;
+      case 3:
+        return houseType.trim().length > 0;
+      case 4:
+        const { guests, bedrooms, beds, bathrooms } = accommodationInfo;
+        return guests > 0 && bedrooms > 0 && beds > 0 && bathrooms > 0;
+      case 6:
+        return price > 0;
+      case 7:
+        return amenities.length > 5;
+      case 8:
+        const { street, city, postalCode, country } = address;
+        return street && city && postalCode && country;
+      default:
+        return true;
+    }
+  };
+
   const steps: ReactNode[] = [
     <Message key="message" />,
     <StepOne key="step1" value={title} onChange={setTitle} />,
@@ -83,57 +107,95 @@ export default function CreateHouse({
     <StepTen key="step10" value={""} onChange={() => {}} />,
     <Resume
       key="resume"
-      title="Meu lindo apartamento"
-      description="Um apartamento confortável no centro"
-      address="Av. da Independência, Luanda"
+      title={title}
+      description={description}
+      address={`${address.street}, ${address.city}`}
       lat={-8.839}
       lng={13.2894}
       images={[]}
-      price={120}
-      guests={4}
-      goToStep={() => {}}
-      onSubmit={() => console.log("Publishing...")}
+      price={price}
+      guests={accommodationInfo.guests}
+      goToStep={(stepNumber: number) => setStep(stepNumber)}
+      onSubmit={() => handleSubmit()}
     />,
   ];
 
   const totalSteps = steps.length;
-  const progressPercent =
-    step === 0 ? 0 : Math.round((step / (totalSteps - 1)) * 100);
+  const progressPercent = Math.round((step / totalSteps) * 100);
 
   const customButton = (title: string, onClick: () => void) => (
     <button
       className="bg-black text-white px-4 py-2 rounded-lg font-medium text-md"
       onClick={onClick}
+      disabled={loading}
     >
-      {title}
+      {loading ? "Carregando..." : title}
     </button>
   );
 
+  const handleSubmit = async () => {
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from("listings")
+      .insert({
+        title,
+        description,
+        status: "Activo",
+        location: address.city || "Desconhecido",
+        image: "/default-house.jpg",
+        price,
+        guests: accommodationInfo.guests,
+        bedrooms: accommodationInfo.bedrooms,
+        beds: accommodationInfo.beds,
+        bathrooms: accommodationInfo.bathrooms,
+        amenities,
+        street: address.street,
+        postal_code: address.postalCode,
+        country: address.country,
+      })
+      .select()
+      .single();
+
+    setLoading(false);
+
+    if (error) {
+      console.error("Error saving listing:", error.message);
+      return;
+    }
+
+    onFinish(data);
+    resetForm();
+    onClose();
+  };
+
   const getButton = () => {
+    const isValid = isStepValid();
+
     if (step === 0)
       return customButton("Começar", () => {
         setDirection(1);
         setStep(1);
       });
-    if (step === totalSteps - 1)
-      return customButton("Finalizar", () => {
-        const newHouse = {
-          id: Date.now(),
-          title,
-          description,
-          status: "Activo", // or "Inactivo" depending on your logic
-          location: address.city || "Desconhecido",
-          image: "/default-house.jpg", // fallback if no image uploaded
-        };
-        onFinish(newHouse);
-        resetForm();
-        onClose();
-      });
 
-    return customButton("Avançar", () => {
-      setDirection(1);
-      setStep(step + 1);
-    });
+    if (step === totalSteps - 1) return customButton("Finalizar", handleSubmit);
+
+    return (
+      <button
+        className={clsx(
+          "bg-black text-white px-4 py-2 rounded-lg font-medium text-md",
+          { "opacity-50 cursor-not-allowed": !isValid || loading }
+        )}
+        onClick={() => {
+          if (!isValid) return;
+          setDirection(1);
+          setStep(step + 1);
+        }}
+        disabled={!isValid || loading}
+      >
+        Avançar
+      </button>
+    );
   };
 
   const stepVariants = {

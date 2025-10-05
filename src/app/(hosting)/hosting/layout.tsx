@@ -1,5 +1,6 @@
-import "../../globals.css";
+import "@/app/globals.css";
 import HostingNav from "@/components/hosting_nav";
+import { createClient } from "../../../../utils/supabase/client";
 import { SessionProvider } from "@/context/SessionContext";
 import AuthWatcher from "../../../../components/auth_watcher";
 import { getSessionAndProfile } from "../../../../hooks/supabase_auth";
@@ -23,7 +24,7 @@ export default async function HostingLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { profile } = await getSessionAndProfile();
+  const { profile, isHost } = await getSessionAndProfile();
 
   return (
     <html
@@ -32,8 +33,8 @@ export default async function HostingLayout({
       data-theme="light"
       className={`scroll-smooth ${inter.variable} ${poppins.variable}`}
     >
-      <body className="antialiased min-h-screen flex flex-col font-sans [font-family:var(--font-inter)]">
-        <SessionProvider initialProfile={profile}>
+      <body className="antialiased min-h-screen flex flex-col font-sans [font-family:var(--font-inter)] ">
+        <SessionProvider initialProfile={profile} initIsHost={isHost}>
           <HostingNav />
           <main className="flex-1">{children}</main>
           <CustomFooter />

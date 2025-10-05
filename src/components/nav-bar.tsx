@@ -2,86 +2,95 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import logo from "../../public/logo.svg";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createClient } from "../../utils/supabase/client";
 import { useSession } from "@/context/SessionContext";
 import { useRouter } from "next/navigation";
 import LinkMenuBtn from "./link_menu_btn";
 import CustomDrawer from "./custom_drawer";
 import CustomDialog from "./custom_dialog";
+import { getSessionAndProfile } from "../../hooks/supabase_auth";
+import Logo from "./logo";
 
-const Navbar = () => {
+export default function Navbar({isHost}:{isHost:boolean}) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const { profile } = useSession();
-  const isHost = profile?.is_host;
+  const { profile} = useSession();
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [openLanguageDialog, setOpenDialog] = useState(false);
   const router = useRouter();
   const supabase = createClient();
-  const [drawerKey, setDrawerKey] = useState(0); // force re-render of drawer
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 3);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 3);
+    };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Logout handler
   const logout = async () => {
     await supabase.auth.signOut();
-    setDrawerKey((prev) => prev + 1); // reset CustomDrawer
-    document.body.style.overflow = ""; // ensure scroll unlock
-    router.push("/"); // redirect after logout
-    console.log("User signed out");
+    setDrawerOpen(false);
+    document.body.style.overflow = "";
+    router.push("/");
   };
+
+  // Handle Esc key to close drawer/dialog
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setDrawerOpen(false);
+        setOpenDialog(false);
+      }
+    },
+    [setDrawerOpen, setOpenDialog]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
+  // Active link helper
 
   return (
     <nav
-      className={`${
+      className={`fixed w-full h-14 z-50 px-4 lg:px-8 ${
         isScrolled
           ? "bg-white shadow-sm text-black"
           : "bg-transparent text-white"
-      } duration-200 z-50 fixed w-full lg:px-8 md:px-8 h-14`}
+      }`}
     >
-      <div className="flex justify-between items-center w-full h-full px-4 2x1:px-16">
-        <div className="container mx-auto">
-          <Link href="/">
-            <Image
-              priority
-              src={logo}
-              alt="Logo"
-              height={205}
-              width={75}
-              className={`${
-                isScrolled ? "invert-0" : "invert"
-              } cursor-pointer w-auto h-[20px]`}
-            />
-          </Link>
-        </div>
+      <div className="flex justify-between items-center w-full h-full">
+        {/* Logo */}
+        <Link href="/">
+          <Logo className={`h-[20px] ${isScrolled? "text-orange-500":"text-white"}`} />
+        </Link>
 
-        <div className="flex flex-row gap-4 justify-between items-center">
+        {/* Right controls */}
+        <div className="flex items-center gap-4">
+          {/* Host Link */}
           <Link
-            href={isHost ? "/hosting" : "/host-setup"}
-            className={`block rounded-md px-3 py-2 transition-colors duration-200 ${
+            href={isHost ? "/hosting" : "/become-a-host"}
+            className={`block rounded-md px-3 py-2 text-xs font-semibold uppercase transition-colors duration-200 ${
               isScrolled
                 ? "text-black hover:bg-gray-100"
                 : "text-white hover:bg-white/10"
             }`}
           >
-            <div className="text-nowrap uppercase text-xs font-semibold">
-              {isHost ? "Modo anfitrião" : "Anuncie aqui a sua casa"}
-            </div>
+            {isHost ? "Modo anfitrião" : "Anuncie aqui a sua casa"}
           </Link>
 
-          {/* Language Button */}
+          {/* Language & Currency */}
           <button
             onClick={() => setOpenDialog(true)}
-            className={`flex block rounded-md px-3 py-2 items-center gap-2
-               text-xs font-semibold uppercase cursor-pointer
-               transition-colors duration-200 ${
-                 isScrolled
-                   ? "text-black hover:bg-gray-100"
-                   : "text-white hover:bg-white/10"
-               }`}
+            className={`flex items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold uppercase transition-colors duration-200 ${
+              isScrolled
+                ? "text-black hover:bg-gray-100"
+                : "text-white hover:bg-white/10"
+            }`}
+            aria-label="Idioma e Moeda"
           >
             <span>PT</span>
             <span className="text-gray-400">|</span>
@@ -93,11 +102,28 @@ const Navbar = () => {
             onClose={() => setOpenDialog(false)}
             title="Idioma & Moeda"
           >
-            <div></div>
+            <div className="space-y-2">
+              <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded">
+                Português (PT)
+              </button>
+              <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded">
+                English (EN)
+              </button>
+              <hr />
+              <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded">
+                AO - Kz
+              </button>
+              <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded">
+                US - USD
+              </button>
+            </div>
           </CustomDialog>
 
-          <CustomDrawer key={drawerKey} isScrolled={isScrolled}>
+          {/* Drawer */}
+
+          <CustomDrawer isScrolled={isScrolled}>
             <div className="p-6 space-y-6">
+              {/* Guest Links */}
               <div>
                 <h2 className="font-normal mb-2 text-gray-500 uppercase text-xs tracking-wide">
                   Viagens
@@ -115,7 +141,9 @@ const Navbar = () => {
                 </ul>
               </div>
               <hr />
-             {isHost ? (
+
+              {/* Hosting */}
+              {isHost ? (
                 <div>
                   <h2 className="font-normal text-gray-500 uppercase text-sm">
                     Hospedagem
@@ -128,10 +156,15 @@ const Navbar = () => {
                 </div>
               ) : (
                 <div>
-                  <LinkMenuBtn href="/host-setup" title="Anuncie aqui a sua casa"/>
+                  <LinkMenuBtn
+                    href="/host-setup"
+                    title="Anuncie aqui a sua casa"
+                  />
                 </div>
               )}
               <hr />
+
+              {/* Account & Help */}
               <div>
                 <ul className="space-y-2 text-lg">
                   <li>
@@ -141,7 +174,10 @@ const Navbar = () => {
                     <Link href="/help-center">Centro de ajuda</Link>
                   </li>
                   <li>
-                    <button onClick={logout} className="cursor-pointer">
+                    <button
+                      onClick={logout}
+                      className="text-left w-full hover:text-red-600 transition"
+                    >
                       Sair
                     </button>
                   </li>
@@ -153,6 +189,4 @@ const Navbar = () => {
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}

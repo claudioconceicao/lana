@@ -1,10 +1,68 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { createClient } from "../../../../../../utils/supabase/client";
 
 export default function CompletedTrips() {
   const completedTrips: any[] = []; // Replace with your real data
 
+  const [loading, setLoading] = useState(false);
+
+  const [bookings, setBookings] = useState([]);
+
+  useEffect(() => {
+      const supabase = createClient();
+  
+      async function loadBookings() {
+        setLoading(true);
+  
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+  
+        if (!session?.user) {
+          setBookings([]);
+          setLoading(false);
+          return;
+        }
+  
+        const { data, error } = await supabase
+          .from("bookings")
+          .select(`
+            id,
+            start_date,
+            end_date,
+            status,
+            listing: listings ( title, location )
+          `)
+          .eq("user_id", session.user.id)
+          .eq("status", "completed")
+          .gte("start_date", new Date().toISOString())
+          .order("start_date", { ascending: true });
+  
+        if (error) {
+          console.error("Error fetching bookings:", error);
+          setBookings([]);
+        } else {
+          console.log("Bookings fetched:", data);
+          setBookings(data || []);
+        }
+  
+        setLoading(false);
+      }
+  
+      loadBookings();
+    }, []);
+
+    
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20 text-gray-500">
+        Carregando suas viagens...
+      </div>
+    );
+  }
   return (
     <div className="flex justify-center">
       <div className="w-full py-16 ">

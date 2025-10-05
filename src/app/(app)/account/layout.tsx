@@ -22,7 +22,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center">
+    <div className="min-h-screen bg-white flex justify-center">
       <div className="flex w-full max-w-6xl gap-12 px-6 py-12">
         {/* Sidebar */}
         <aside className="hidden sticky top-27 lg:flex lg:flex-col w-80 h-fit px-6 py-8 bg-white border border-gray-200 rounded-2xl shadow-lg sticky top-10">
@@ -60,8 +60,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     px-4 sm:px-6 md:px-8 
     py-6 sm:py-8 
     bg-white 
-    rounded-2xl 
-    shadow-sm 
     lg:max-w-3xl
   "
         >

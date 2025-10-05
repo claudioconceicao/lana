@@ -1,34 +1,52 @@
-import { createServerSupabaseClient } from "../utils/supabase/server";
-import { headers } from "next/headers";
+import { createClient } from "../utils/supabase/server";
+import { cookies } from "next/headers";
+
 
 export async function getSessionAndProfile() {
-  const supabase = await createServerSupabaseClient();
+  // Server-side Supabase client
+  const supabase = await createClient(cookies());
 
-  // ✅ Use secure user fetch
   try {
+    // Get logged-in user
     const {
       data: { user },
+      error: userError,
     } = await supabase.auth.getUser();
-      // Fetch profile from DB
+
+    if (userError || !user) {
+      return { user: null, profile: null, isHost: false };
+    }
+
+    // Fetch profile from DB
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("*")
-      .eq("id", user?.id)
+      .eq("profile_id", user.id)
       .single();
 
-    const headerStore = await headers();
-    const pathname = headerStore.get("x-pathname") || "/";
+    if (profileError) {
+      console.warn("Profile not found:", profileError.message);
+    }
+
+    // Check if user has host role
+    const { data: hostRole, error: hostError } = await supabase
+      .from("profile_roles")
+      .select("*")
+      .eq("profile_id", user.id)
+      .eq("role_id", 2)
+      .maybeSingle();
+
+    if (hostError) {
+      console.warn("Error fetching host role:", hostError.message);
+    }
+
     return {
       user,
-      profile: profileError ? null : profile,
-      pathname
+      profile: profile || null,
+      isHost: Boolean(hostRole),
     };
-
-} catch (userError) {
-  console.error("Supabase error:", userError);
-  const headerStore = await headers();
-  const pathname = headerStore.get("x-pathname") || "/";
-  return { user: null, profile: null, pathname };
-}
-
+  } catch (err) {
+    console.error("Supabase error:", err);
+    return { user: null, profile: null, isHost: false };
+  }
 }

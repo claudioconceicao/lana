@@ -1,25 +1,37 @@
 import Image from "next/image";
 
-const MessageCard = () => {
+const MessageCard = ({selected, onClick}:{selected:boolean, onClick:() => void}) => {
+  const bgClass = selected ? "bg-orange-100" : "bg-white hover:bg-gray-100";
   return (
-    <div className="flex flex-row w-full items-center cursor-pointer hover:bg-gray-100 overflow-hidden">
-      <div className="">
-        <Image
-          width={100}
-          height={100}
-          src="/images/image.png"
-          alt="House"
-          className="w-12 h-12 rounded-full"
-        />
-      </div>
-      <div className="flex flex-col w-full px-2">
-        <div className="flex justify-between">
-          <h3 className="text-md font-semibold">Receiver name</h3>
-          <p>data </p>
+    <button
+      className={`flex flex-row items-center gap-3 p-3 w-full rounded-lg ${bgClass} transition`}
+      onClick={onClick}
+    >
+      {/* Avatar */}
+      <Image
+        width={48}
+        height={48}
+        src="/images/image.png"
+        alt="Receiver profile picture"
+        className="w-12 h-12 rounded-full object-cover"
+      />
+
+      {/* Content */}
+      <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex justify-between items-center">
+          <h3 className="text-sm font-semibold text-gray-900 truncate">
+            Receiver name
+          </h3>
+          <p className="text-xs text-gray-400 ml-2 whitespace-nowrap">
+            12:45
+          </p>
         </div>
-        <p className="text-sm text-gray-500">Mensagem de teste</p>
+        <p className="text-sm flex text-gray-500 truncate">
+          Mensagem de teste que pode ser longa...
+        </p>
       </div>
-    </div>
+    </button>
   );
 };
+
 export default MessageCard;

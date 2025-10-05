@@ -5,15 +5,33 @@ const Notifications = () => {
   const [emailNotif, setEmailNotif] = useState(true);
   const [smsNotif, setSmsNotif] = useState(false);
   const [pushNotif, setPushNotif] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault(); // prevent page reload
+    setLoading(true);
+    setMessage("");
+
+    try {
+      // TODO: Save settings to backend (e.g., Supabase)
+      await new Promise((res) => setTimeout(res, 1000)); // simulate async save
+      setMessage("Preferências salvas com sucesso!");
+    } catch (err) {
+      setMessage("Erro ao salvar preferências.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6">
+    <div className="w-full max-w-2xl mx-auto space-y-6 p-6">
       <h1 className="text-2xl font-semibold">Notificações</h1>
       <p className="text-gray-600">
         Gerencie suas preferências de notificações aqui.
       </p>
 
-      <form className="space-y-6">
+      <form className="space-y-6" onSubmit={handleSave}>
         {/* Email */}
         <div className="flex items-center justify-between border-b pb-3">
           <div>
@@ -77,10 +95,16 @@ const Notifications = () => {
         {/* Save Button */}
         <button
           type="submit"
-          className="mt-4 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition"
+          disabled={loading}
+          className={`mt-4 px-6 py-3 text-white font-medium rounded-lg transition ${
+            loading ? "bg-gray-400 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600"
+          }`}
         >
-          Salvar Preferências
+          {loading ? "Salvando..." : "Salvar Preferências"}
         </button>
+
+        {/* Message */}
+        {message && <p className="mt-2 text-sm text-green-600">{message}</p>}
       </form>
     </div>
   );

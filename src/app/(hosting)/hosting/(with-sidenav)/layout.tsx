@@ -8,7 +8,7 @@ export default function StructureLayout({
 
   return (
     <div className="w-full" style={{ height: "calc(100vh - 64px)" }}>
-      <div className="flex h-full overflow-hidden">
+      <div className="flex flex-row h-full w-full items-start justify-start overflow-hidden">
         <Sidebar />
         <main className="flex-1 ml-8">{children}</main>
       </div>

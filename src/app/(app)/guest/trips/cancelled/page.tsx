@@ -1,8 +1,72 @@
 "use client";
 
+import { createClient } from "../../../../../../utils/supabase/client";
+import {useState, useEffect} from "react";
+
 export default function CancelledTrips() {
   const cancelledTrips: any[] = []; // Replace with your real data
+  const [loading, setLoading] = useState(false);
+  type Booking = {
+    id: any;
+    start_date: any;
+    end_date: any;
+    status:any
+    listing: { title: any; location: any }[];
+  };
+  const [bookings, setBookings] = useState<Booking[]>([]);
 
+  useEffect(() => {
+      const supabase = createClient();
+  
+      async function loadBookings() {
+        setLoading(true);
+  
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+  
+        if (!session?.user) {
+          setBookings([]);
+          setLoading(false);
+          return;
+        }
+  
+        const { data, error } = await supabase
+          .from("bookings")
+          .select(`
+            id,
+            start_date,
+            end_date,
+            status,
+            listing: listings ( title, location )
+          `)
+          .eq("user_id", session.user.id)
+          .eq("status", "cancelled")
+          .gte("start_date", new Date().toISOString())
+          .order("start_date", { ascending: true });
+  
+        if (error) {
+          console.error("Error fetching bookings:", error);
+          setBookings([]);
+        } else {
+          console.log("Bookings fetched:", data);
+          setBookings(data || []);
+        }
+  
+        setLoading(false);
+      }
+  
+      loadBookings();
+    }, []);
+
+    
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20 text-gray-500">
+        Carregando suas viagens...
+      </div>
+    );
+  }
   return (
     <div className="flex justify-center">
       <div className="w-full py-16">

@@ -1,10 +1,13 @@
 
+"use client";
 import BookingPanel from "@/components/booking-panel";
 import CustomNavBar from "@/components/custom_navbar";
 import ImageGrid from "@/components/image-grid";
 import { CheckCircleIcon, StarIcon } from "lucide-react";
 import Link from "next/link";
 import RegularNav from "@/components/regular_nav";
+import { homedir } from "os";
+import { useRef } from "react";
 
 const ListingDetail = ({ params }: { params: { homeId: string } }) => {
   const amenities = [
@@ -20,6 +23,9 @@ const ListingDetail = ({ params }: { params: { homeId: string } }) => {
     "Hangers",
   ];
 
+  const stopRef = useRef<HTMLDivElement | null>(null);
+
+  const listing = {}
   return (
     <div className="">
      <div id="images">
@@ -65,9 +71,9 @@ const ListingDetail = ({ params }: { params: { homeId: string } }) => {
             </button>
           </div>
         </div>
-        <BookingPanel />
+        <BookingPanel listing_id={"0"} listing_price={0}  />
       </div>
-      <div id="location" className="mx-[150] mt-8">
+      <div ref={stopRef} id="location" className="mx-[150] mt-8">
         <h2 className="text-2xl font-semibold mt-4">Sobre a banda</h2>
         <div className="mt-8">
           <iframe

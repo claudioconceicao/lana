@@ -11,7 +11,7 @@ const BookHome = () => {
     return (  
         <>
             <h1>Reservar casa</h1>
-            <button onClick={handleClick}></button>
+            <button onClick={handleClick}>Reservar</button>
         </>
     );
 }

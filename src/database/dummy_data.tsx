@@ -17,7 +17,7 @@ export const dummy = {
             description: "A cozy cottage in the countryside.",
             price: 100,
             location: "Countryside",
-            availableDates: ["2023-10-01", "2023-10-02", "2023-10-03"]
+            availableDates: ["2025-10-01", "2025-10-02", "2025-10-03"]
         },
         {
             id: 2,
@@ -25,7 +25,7 @@ export const dummy = {
             description: "A modern apartment in the city center.",
             price: 150,
             location: "City Center",
-            availableDates: ["2023-10-05", "2023-10-06", "2023-10-07"]
+            availableDates: ["2025-10-05", "2025-10-06", "2025-10-07"]
         },
         {
             id: 3,
@@ -33,7 +33,7 @@ export const dummy = {
             description: "A beautiful beach house with ocean views.",
             price: 200,
             location: "Beachfront",
-            availableDates: ["2023-10-10", "2023-10-11", "2023-10-12"]
+            availableDates: ["2025-10-10", "2025-10-11", "2025-10-12"]
         },
         {
             id: 4,
@@ -41,7 +41,7 @@ export const dummy = {
             description: "A serene mountain retreat for nature lovers.",
             price: 180,
             location: "Mountains",
-            availableDates: ["2023-10-15", "2023-10-16", "2023-10-17"]
+            availableDates: ["2025-10-15", "2025-10-16", "2025-10-17"]
         },
         {
             id: 5,
@@ -49,7 +49,7 @@ export const dummy = {
             description: "A stylish urban loft in a trendy neighborhood.",
             price: 120,
             location: "Downtown",
-            availableDates: ["2023-10-20", "2023-10-21", "2023-10-22"]
+            availableDates: ["2025-10-20", "2025-10-21", "2025-10-22"]
         },
         {
             id: 6,
@@ -57,7 +57,7 @@ export const dummy = {
             description: "A spacious suburban home with a backyard.",
             price: 130,
             location: "Suburbia",
-            availableDates: ["2023-10-25", "2023-10-26", "2023-10-27"]
+            availableDates: ["2025-10-25", "2025-10-26", "2025-10-27"]
         },
         {
             id: 7,
@@ -65,7 +65,7 @@ export const dummy = {
             description: "A luxury villa with a private pool.",
             price: 300,
             location: "Exclusive Area",
-            availableDates: ["2023-10-30", "2023-10-31", "2023-11-01"]
+            availableDates: ["2025-10-30", "2025-10-31", "2025-11-01"]
         },
         {
             id: 8,
@@ -73,7 +73,7 @@ export const dummy = {
             description: "A rustic cabin in the woods.",
             price: 90,
             location: "Forest",
-            availableDates: ["2023-11-05", "2023-11-06", "2023-11-07"]
+            availableDates: ["2025-11-05", "2025-11-06", "2025-11-07"]
         },
         {
             id: 9,
@@ -81,7 +81,7 @@ export const dummy = {
             description: "A luxurious penthouse suite with city views.",
             price: 250,
             location: "Skyline",
-            availableDates: ["2023-11-10", "2023-11-11", "2023-11-12"]
+            availableDates: ["2025-11-10", "2025-11-11", "2025-11-12"]
         },
         {
             id: 10,
@@ -89,7 +89,7 @@ export const dummy = {
             description: "A charming bungalow with a garden.",
             price: 110,
             location: "Residential Area",
-            availableDates: ["2023-11-15", "2023-11-16", "2023-11-17"]
+            availableDates: ["2025-11-15", "2025-11-16", "2025-11-17"]
         },
         
     ]};

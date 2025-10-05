@@ -1,65 +1,165 @@
-import Modal from "./ui/modal";
-import { useState, useEffect } from "react";
+"use client";
+import { useState } from "react";
+import { X, Loader2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { createClient } from "../../utils/supabase/client";
+import AuthButton from "./authButton";
+import { FaFacebook } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { BsApple } from "react-icons/bs";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 
-const LoginModal = () => {
+export default function LoginModal({
+  setRegEmail,
+  onSwitch,
+}: {
+  setRegEmail: (email: string) => void;
+  onSwitch: () => void;
+}) {
+  const supabase = createClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [errorMsg, setErrorMsg] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState<"email" | "password">("email");
 
-    const [isOpen, setIsOpen] = useState(true);
+  // Auth handler
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg("");
 
-    const handleClose = () => {
-        setIsOpen(false);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setLoading(false);
+    if (error) {
+      setErrorMsg(error.message);
+      return;
     }
-    useEffect(
-        () => {
-            return () => {
+    const redirectTo = searchParams.get("redirect") || "/";
+    router.push(redirectTo);
+  };
 
-            };
-      }
-    )
-    return (
-    <Modal onClose={() => handleClose()} isOpen={isOpen}>
-      <div className="login-modal mt-12 h-[400]">
-        <h2 className="text-2xl font-bold">Login</h2>
-        <form className="mt-4">
-          <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
+  const handleNextStep = async () => {
+    setLoading(true);
+    setErrorMsg("");
+
+    const { data, error } = await supabase.rpc("check_user_exists", {
+      user_email: email,
+    });
+
+    if (error) {
+      setErrorMsg("Erro ao verificar o email.");
+      setLoading(false);
+      return;
+    }
+    if (data) {
+      setStep("password");
+    } else {
+      setLoading(false);
+      onSwitch();
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <h1 className="text-2xl text-black font-medium">Login</h1>
+      <p className="text-lg text-gray-500 mt-2">Bem vindo de volta</p>
+
+      <form
+        className="mt-6"
+        autoComplete="off"
+        onSubmit={step === "password" ? handleAuth : (e) => e.preventDefault()}
+      >
+        <div className="flex flex-col gap-3">
+          {/* Email */}
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setRegEmail(e.target.value);
+            }}
+            required
+            autoComplete="email"
+            className="border border-gray-400 rounded h-11 px-2 text-black"
+          />
+
+          {/* Password field with transition */}
+          <AnimatePresence>
+            {step === "password" && (
+              <motion.div
+                key="passwordField"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+                className="flex flex-col gap-2"
+              >
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="border border-gray-400 rounded h-11 px-2 text-black"
+                />
+                <div className="flex justify-end text-sm">
+                  <Link
+                    href="/forgot-password"
+                    className="hover:underline text-gray-600"
+                  >
+                    Esqueceu a password?
+                  </Link>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Buttons */}
+          {step === "email" ? (
+            <button
+              type="button"
+              onClick={handleNextStep}
+              disabled={loading}
+              className="h-11 mt-2 bg-black text-white rounded font-medium flex items-center justify-center disabled:opacity-70"
             >
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              className="mt-1 block p-3 w-full border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
-            />
-          </div>
-          <div className="mb-4 hidden">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Próximo"}
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={loading}
+              className="h-11 mt-2 bg-black text-white rounded font-medium flex items-center justify-center disabled:opacity-70"
             >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              className="mt-1 block p-3 w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
-            />
-          </div>
-          <button
-            type="submit"
-            className="cursor-pointer w-full bg-orange-500 text-white py-2 px-4 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-          >
-            Login
-          </button>
-        </form>
-  
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Login"}
+            </button>
+          )}
+
+          {errorMsg && <p className="text-red-500">{errorMsg}</p>}
+        </div>
+      </form>
+
+      {/* Social login */}
+      <div className="flex items-center gap-2 my-6">
+        <hr className="flex-1 border-gray-200" />
+        <span className="text-sm text-gray-500">ou continue com</span>
+        <hr className="flex-1 border-gray-200" />
       </div>
-    </Modal>
+
+      <div className="flex justify-evenly gap-4 text-black">
+        <AuthButton href="#" icon={<FaFacebook className="w-10 h-10" />} />
+        <AuthButton href="#" icon={<FcGoogle className="w-10 h-10" />} />
+        <AuthButton href="#" icon={<BsApple className="w-10 h-10" />} />
+      </div>
+    </div>
   );
-};
-export default LoginModal;
+}
