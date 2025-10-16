@@ -9,7 +9,7 @@ import {
   Trash2,
   Link as LinkIcon,
 } from "lucide-react";
-import { createClient } from "../../../../../utils/supabase/client";
+import { createClient } from "../../../../lib/supabase/client";
 import { motion } from "framer-motion";
 import { Provider } from "@supabase/supabase-js";
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, ChangeEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { createClient } from "../../../../../../utils/supabase/client";
+import { createClient } from "../../../../../lib/supabase/client";
 import { HostingListingCardShimmer } from "@/components/listing_shimmer";
 import Image from "next/image";
 import HostingListingCard from "@/components/listing_list_card";

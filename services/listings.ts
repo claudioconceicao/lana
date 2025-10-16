@@ -1,5 +1,5 @@
-import { createClient } from "../utils/supabase/client";
-import { Database } from "../utils/supabase/models";
+import { createClient } from "../src/lib/supabase/client";
+import { Database } from "../src/lib/supabase/models";
 
 export type Listing = Database["public"]["Tables"]["listings"]["Row"];
 export type NewListing = Database["public"]["Tables"]["listings"]["Insert"];

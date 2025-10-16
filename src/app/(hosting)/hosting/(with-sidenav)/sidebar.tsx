@@ -2,7 +2,7 @@
 
 import HostingListingCard from "@/components/listing_list_card";
 import { useState, useEffect, ChangeEvent } from "react";
-import { createClient } from "../../../../../utils/supabase/client";
+import { createClient } from "../../../../lib/supabase/client";
 import { useSession } from "@/context/SessionContext";
 import { HostingListingCardShimmer } from "@/components/listing_shimmer";
 import clsx from "clsx";

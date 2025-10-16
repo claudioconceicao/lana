@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { createClient } from "../../utils/supabase/client";
+import { createClient } from "../lib/supabase/client";
 
 export default function RegisterModal({
   email: initialEmail,

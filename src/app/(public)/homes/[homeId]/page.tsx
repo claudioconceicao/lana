@@ -7,8 +7,8 @@ import Link from "next/link";
 import RegularNav from "@/components/regular_nav";
 import { homedir } from "os";
 import React, { useRef, useEffect, useState } from "react";
-import { createClient } from "../../../../../utils/supabase/client";
-import { Database } from "../../../../../utils/supabase/models";
+import { createClient } from "../../../../lib/supabase/client";
+import { Database } from "../../../../lib/supabase/models";
 
 
 type Listing = Database['public']['Tables']['listings']['Row'];

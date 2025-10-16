@@ -8,7 +8,7 @@ import CustomDrawer from "./custom_drawer";
 import LinkMenuBtn from "./link_menu_btn";
 import { useSession } from "@/context/SessionContext";
 import { useRouter } from "next/navigation";
-import { createClient } from "../../utils/supabase/client";
+import { createClient } from "../lib/supabase/client";
 import Logo from "./logo";
 
 const HostingNav = () => {

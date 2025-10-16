@@ -4,7 +4,7 @@ import Image from "next/image";
 import { IoMdAdd } from "react-icons/io";
 import { useRouter, useSearchParams } from "next/navigation";
 import CreateListing from "./create/page";
-import { createClient } from "../../../../../utils/supabase/client";
+import { createClient } from "../../../../lib/supabase/client";
 import { useSession } from "@/context/SessionContext";
 import { LoaderCircle } from "lucide-react";
 

@@ -4,9 +4,9 @@ import Image from "next/image";
 import EditOnPage from "../edit_on_page";
 import ImageGrid from "@/components/image-grid";
 import { useEffect, useState } from "react";
-import { createClient } from "../../../../../../../../utils/supabase/client";
+import { createClient } from "../../../../../../../lib/supabase/client";
 import { useParams } from "next/navigation";
-import { Database } from "../../../../../../../../utils/supabase/models";
+import { Database } from "../../../../../../../lib/supabase/models";
 import EditAccordion from "../edit_accordion";
 import { LoaderCircle } from "lucide-react";
 

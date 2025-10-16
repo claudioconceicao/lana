@@ -1,6 +1,6 @@
 "use client";
 import { useState, useMemo } from "react";
-import { Database } from "../../../../../utils/supabase/models";
+import { Database } from "../../../../lib/supabase/models";
 
 
 interface Transaction {

@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { createClient } from "../../../../../../utils/supabase/client";
-import { Database } from "../../../../../../utils/supabase/models";
+import { createClient } from "../../../../../lib/supabase/client";
+import { Database } from "../../../../../lib/supabase/models";
 
 export default function CompletedTrips() {
   const [loading, setLoading] = useState(false);

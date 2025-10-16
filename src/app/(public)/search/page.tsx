@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import ListingCard from "@/components/listing_card";
 import SearchBox from "@/components/search_box";
 import { dummy } from "@/database/dummy_data";
-import { Database } from "../../../../utils/supabase/models";
+import { Database } from "../../../lib/supabase/models";
 
 // ✅ Add minimal typing for clarity
 type Listing = Database["public"]["Tables"]["listings"]["Row"];

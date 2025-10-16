@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useCallback } from "react";
-import { createClient } from "../../utils/supabase/client";
+import { createClient } from "../lib/supabase/client";
 import { useSession } from "@/context/SessionContext";
 import { useRouter } from "next/navigation";
 import LinkMenuBtn from "./link_menu_btn";

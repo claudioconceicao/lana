@@ -1,6 +1,6 @@
 import "@/app/globals.css";
 import HostingNav from "@/components/hosting_nav";
-import { createClient } from "../../../../utils/supabase/client";
+import { createClient } from "../../../lib/supabase/client";
 import { SessionProvider } from "@/context/SessionContext";
 import AuthWatcher from "../../../../components/auth_watcher";
 import { getSessionAndProfile } from "../../../../hooks/supabase_auth";

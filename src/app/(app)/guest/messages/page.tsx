@@ -3,7 +3,7 @@
 import { ChangeEvent, useState } from "react";
 import MessageCard from "@/components/message-card";
 import Chat from "@/components/chat";
-import { Database } from "../../../../../utils/supabase/models";
+import { Database } from "../../../../lib/supabase/models";
 
 
 type Message = Database["public"]["Tables"]["messages"]["Row"];

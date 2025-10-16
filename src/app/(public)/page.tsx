@@ -16,7 +16,7 @@ import { FaHome } from "react-icons/fa";
 import { Globe, Home, Wallet } from "lucide-react";
 import EarningCalculator from "@/components/earning-calculator";
 import Loader from "./loading";
-import { createClient } from "../../../utils/supabase/client";
+import { createClient } from "../../lib/supabase/client";
 import ListingCardSkeleton from "@/components/listing_card_skeleton";
 import { BsHeadset } from "react-icons/bs";
 

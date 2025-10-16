@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import ReservationCard from "@/components/reseveration-card";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
-import { Database } from "../../utils/supabase/models";
+import { Database } from "../lib/supabase/models";
 
 type Booking = Database["public"]["Tables"]["bookings"]["Row"];
 type ReservationScrollProps = {

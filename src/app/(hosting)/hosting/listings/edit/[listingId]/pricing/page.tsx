@@ -4,9 +4,9 @@ import Link from "next/link";
 import { MdOutlineFileDownload, MdOutlineFileUpload } from "react-icons/md";
 import EditAccordion from "../edit_accordion";
 import { useEffect, useState } from "react";
-import { createClient } from "../../../../../../../../utils/supabase/client";
+import { createClient } from "../../../../../../../lib/supabase/client";
 import { useParams } from "next/navigation";
-import { Database } from "../../../../../../../../utils/supabase/models";
+import { Database } from "../../../../../../../lib/supabase/models";
 import { CiExport } from "react-icons/ci";
 import { CiImport } from "react-icons/ci";
 

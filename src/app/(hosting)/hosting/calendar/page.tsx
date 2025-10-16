@@ -10,7 +10,7 @@ import HostingListingCard from "@/components/listing_list_card";
 import { dummy } from "@/database/dummy_data";
 import { CalendarApi } from "@fullcalendar/core";
 import { useParams } from "next/navigation";
-import { createClient } from "../../../../../utils/supabase/client";
+import { createClient } from "../../../../lib/supabase/client";
 import { useSession } from "@/context/SessionContext";
 import { HostingListingCardShimmer } from "@/components/listing_shimmer";
 

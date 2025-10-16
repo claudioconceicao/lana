@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { createClient } from '../utils/supabase/client';
+import { createClient } from '../src/lib/supabase/client';
 import { useRouter, usePathname } from 'next/navigation';
 
 export default function AuthWatcher() {

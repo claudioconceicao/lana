@@ -8,9 +8,9 @@ import clsx from "clsx";
 import ReservationScroll from "@/components/reservation_scroll";
 import { useRouter, useSearchParams } from "next/navigation";
 import CreateListing from "./listings/create/page";
-import { createClient } from "../../../../utils/supabase/client";
+import { createClient } from "../../../lib/supabase/client";
 import { useSession } from "@/context/SessionContext";
-import { Database } from "../../../../utils/supabase/models";
+import { Database } from "../../../lib/supabase/models";
 
 /* ------------------ Theme ------------------ */
 const themeColors = {

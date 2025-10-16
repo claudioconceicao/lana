@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
-import { createClient } from "../../../../../../utils/supabase/client";
+import { createClient } from "../../../../../lib/supabase/client";
 
 const Message = dynamic(() => import("./steps/message"), { ssr: false });
 const StepOne = dynamic(() => import("./steps/step-one"), { ssr: false });

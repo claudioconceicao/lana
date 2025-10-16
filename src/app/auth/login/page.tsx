@@ -5,7 +5,7 @@ import RegularNav from "@/components/regular_nav";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { createClient } from "../../../../utils/supabase/client";
+import { createClient } from "../../../lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa6";

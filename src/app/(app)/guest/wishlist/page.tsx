@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "../../../../../utils/supabase/client";
-import { Database } from "../../../../../utils/supabase/models";
+import { createClient } from "../../../../lib/supabase/client";
+import { Database } from "../../../../lib/supabase/models";
 import ListingCard from "@/components/listing_card";
 
 type ListingRow = Database["public"]["Tables"]["listings"]["Row"];

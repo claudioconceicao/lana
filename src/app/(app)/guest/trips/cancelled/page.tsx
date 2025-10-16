@@ -1,8 +1,8 @@
 "use client";
 
-import { createClient } from "../../../../../../utils/supabase/client";
+import { createClient } from "../../../../../lib/supabase/client";
 import { useState, useEffect } from "react";
-import { Database } from "../../../../../../utils/supabase/models";
+import { Database } from "../../../../../lib/supabase/models";
 import Image from "next/image";
 
 type Booking = Database["public"]["Tables"]["bookings"]["Row"];

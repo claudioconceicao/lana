@@ -4,7 +4,7 @@ import { ImageCarousel } from "./image_carousel";
 import { FaStar, FaHeart, FaRegHeart } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { createClient } from "../../utils/supabase/client";
+import { createClient } from "../lib/supabase/client";
 import { useSession } from "@/context/SessionContext";
 
 interface ListingCardProps {

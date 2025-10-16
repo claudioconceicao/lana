@@ -8,7 +8,7 @@ import { BsApple } from "react-icons/bs";
 import { FaFacebook } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { createClient } from "../../utils/supabase/client";
+import { createClient } from "../lib/supabase/client";
 import { TbMenu3 } from "react-icons/tb";
 import MenuButton from "./menu_button";
 import LoginModal from "./login_modal";

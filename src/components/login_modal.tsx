@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "../../utils/supabase/client";
+import { createClient } from "../lib/supabase/client";
 import AuthButton from "./authButton";
 import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";

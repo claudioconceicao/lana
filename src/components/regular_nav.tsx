@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { createClient } from "../../utils/supabase/client";
+import { createClient } from "../lib/supabase/client";
 import CustomDrawer from "./custom_drawer";
 import LinkMenuBtn from "./link_menu_btn";
 import Logo from "./logo";

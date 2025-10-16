@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "../../../../../../utils/supabase/client";
-import { Database } from "../../../../../../utils/supabase/models";
+import { createClient } from "../../../../../lib/supabase/client";
+import { Database } from "../../../../../lib/supabase/models";
 
 type Bookings = {
   booking_id: string;
