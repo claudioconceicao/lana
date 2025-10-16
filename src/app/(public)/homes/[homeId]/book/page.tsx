@@ -5,20 +5,27 @@ import ConfirmButton from "./confirmation_button";
 import React from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export const dynamic = "force-static";
 
 export async function generateStaticParams() {
   const supabase = createClient();
-  const { data: listings } = await supabase
-    .from("listings")
-    .select("id");
 
-  return (
-    listings?.map((listing) => ({
-      homeId: listing.id.toString(),
-    })) || []
-  );
+  const { data, error } = await supabase
+    .from("listings")
+    .select("listing_id");
+
+  if (error) {
+    console.error("Error fetching listings for static params:", error);
+    return [];
+  }
+
+  // Map each listing into the route param format
+  return data.map((listing) => ({
+    homeId: listing.listing_id.toString(),
+  }));
 }
+
+export const dynamic = "force-static";
+export const revalidate = false;
 
 export default function BookingPage({
   params,
