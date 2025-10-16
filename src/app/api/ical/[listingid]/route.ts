@@ -1,12 +1,14 @@
-
+// src/app/api/ical/[listingid]/route.ts
 import { NextResponse } from "next/server";
 
 export async function GET(
-  request: Request, context: { params: { listingid: string } }
+  request: Request,
+  context: { params: Promise<{ listingId: string }> }
 ) {
-  const { listingid } = context.params;
+  const { listingId } = await context.params;
 
+  // Your logic here
   return NextResponse.json({
-    message: `iCal feed for listing ${listingid}`,
+    message: `iCal feed for listing ${listingId}`,
   });
 }
