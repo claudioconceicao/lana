@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, MouseEvent } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 interface ModalProps {
@@ -10,15 +10,15 @@ interface ModalProps {
 }
 
 export default function Modal({ isOpen, onClose, children }: ModalProps) {
-  const [render, setRender] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setRender(true);
+    setMounted(true);
   }, []);
 
   useEffect(() => {
-    function handleClickOutside(event: globalThis.MouseEvent) {
+    function handleClickOutside(event: MouseEvent) {
       if (
         modalRef.current &&
         !modalRef.current.contains(event.target as Node) &&
@@ -27,11 +27,8 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
         onClose();
       }
     }
-
     document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
+    return () => document.removeEventListener("click", handleClickOutside);
   }, [isOpen, onClose]);
 
   useEffect(() => {
@@ -46,28 +43,24 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
   }, [isOpen]);
 
   useEffect(() => {
-    function handlerKey(e: KeyboardEvent) {
+    function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
     }
-
-    if (isOpen) {
-      document.addEventListener("keydown", handlerKey);
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handlerKey);
-      setRender(false);
-    };
+    if (isOpen) document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
   }, [isOpen, onClose]);
 
-  if (!render || !isOpen) return null;
+  if (!mounted || !isOpen) return null;
 
   return createPortal(
-    <div className="isolate fixed inset-0 bg-black/40 backdrop-blur-sm backdrop-brightness-75 z-50 flex items-center justify-center transition-all duration-700">
-      <div className="bg-white w-full max-w-lg mx-auto p-8 rounded shadow-lg relative">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center transition-all duration-700">
+      <div
+        ref={modalRef}
+        className="bg-white w-full max-w-lg mx-auto p-8 rounded shadow-lg relative"
+      >
         <button
           onClick={onClose}
-          className="absolute top-8 right-8 justify-right text-black font-bold cursor-pointer hover:font-normal hover:text-gray-500 transition-all duration-300"
+          className="absolute top-8 right-8 text-black font-bold hover:font-normal hover:text-gray-500 transition-all"
         >
           ✕
         </button>
