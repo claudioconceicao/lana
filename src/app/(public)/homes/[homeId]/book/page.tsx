@@ -4,17 +4,23 @@ import PaymentDetails from "./payment_details";
 import ConfirmButton from "./confirmation_button";
 import React from "react";
 
+// ✅ Required for static export
+export const dynamic = "force-static";
+
+export async function generateStaticParams() {
+  // You can replace these IDs with real ones later
+  return [{ homeId: "1" }];
+}
+
 export default function BookingPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ homeId: string }>;
-  searchParams: Promise< { dates: string; guests: string }>;
+  params: { homeId: string };
+  searchParams: { dates?: string; guests?: string };
 }) {
-
-  const {homeId} = React.use(params);
-
-  const {dates, guests} = React.use(searchParams);
+  const { homeId } = params;
+  const { dates = "", guests = "" } = searchParams ?? {};
 
   const listingId = homeId;
 
