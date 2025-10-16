@@ -366,18 +366,23 @@ export default function Pricing() {
           Sincronizar calendário
         </h3>
         <div className="space-y-2">
-          <Link
-            href={""}
-            className="flex flex-inline space-x-2 items-center underline underline-offset-2"
-          >
-            <CiExport className="w-5 h-5" /> <span> Exportar calendário </span>
-          </Link>
-          <Link
-            href={""}
-            className="flex flex-inline  space-x-2 items-center underline underline-offset-2"
-          >
-            <CiImport className="w-5 h-5 " /> <span> Importar calendário </span>
-          </Link>
+           <Link
+        href={`/api/ical/${listingId}`}
+        target="_blank"
+        className="flex flex-inline space-x-2 items-center underline underline-offset-2"
+      >
+        <CiExport className="w-5 h-5" />
+        <span>Exportar calendário</span>
+      </Link>
+
+      {/* Import Calendar */}
+      <Link
+        href={`/hosting/listings/${listingId}/calendar/import`}
+        className="flex flex-inline space-x-2 items-center underline underline-offset-2"
+      >
+        <CiImport className="w-5 h-5" />
+        <span>Importar calendário</span>
+      </Link>
         </div>
       </div>
     </div>
