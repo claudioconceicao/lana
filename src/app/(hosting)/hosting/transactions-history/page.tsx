@@ -1,8 +1,16 @@
 "use client";
 import { useState, useMemo } from "react";
+import { Database } from "../../../../../utils/supabase/models";
 
+
+interface Transaction {
+  id: number;
+  title: string;
+  date: string;
+  amount: number;
+}
 // TransactionCard component
-const TransactionCard = ({ transaction }) => {
+const TransactionCard = ({ transaction} : {transaction: Transaction}) => {
   return (
     <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition mb-3">
       <div>

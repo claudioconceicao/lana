@@ -16,6 +16,12 @@ type Amenities = Database["public"]["Tables"]["amenities"]["Row"];
 type ListingWithExtras = ListingRow & {
   amenities: string[];
   images: string[];
+  province?: { name: string } | null;
+  municipality?: { name: string } | null;
+  district?: { name: string } | null;
+  property_type?: { name: string } | null;
+  accommodation_type?: { name: string } | null;
+  country?: { name: string } | null;
 };
 
 const statusPt = {
@@ -26,20 +32,23 @@ const statusPt = {
 
 export default function Details() {
   const [listing, setListing] = useState<ListingWithExtras | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [amenities, setAmenities] = useState<Amenities[]>([]);
   const supabase = createClient();
   const params = useParams();
-  const [loading, setLoading] = useState(true);
   const listingId = params?.listingId as string;
-  const [amenities, setAmenities] = useState<Amenities[]>([]);
-  const [municipality, setMunicipality] = useState();
-  const [province, setProvince] = useState();
-  const [district, setDistrict] = useState();
-  const [images, setImages] = useState<string[] | null>(null);
 
   useEffect(() => {
     if (!listingId) return;
+    fetchListing(listingId);
+    fetchAmenities();
+  }, [listingId]);
 
-    const fetchListing = async () => {
+  /**
+   * Fetches full listing data including related tables
+   */
+  const fetchListing = async (id: string) => {
+    try {
       setLoading(true);
       const { data, error } = await supabase
         .from("listings")
@@ -51,39 +60,55 @@ export default function Details() {
           description,
           status,
           city,
-          province:province_id(name),
-          country:country_code(name),
-          district:district_id(name),
-          accommodation_type:accommodation_type(name),
-          property_type:property_type(name),
-          municipality:municipality_id(name),
           street_line1,
           street_line2,
           max_guests,
           no_of_bedrooms,
           no_of_beds,
           no_of_bathrooms,
-          listings_amenities ( amenity_id, amenities(name) ),
-          listing_images ( image_url )
+          building_floors,
+          floor,
+          neighbourhood_description,
+          getting_around,
+          location_sharing,
+          province:province_id(name),
+          country:country_code(name),
+          district:district_id(name),
+          municipality:municipality_id(name),
+          accommodation_type:accommodation_type(name),
+          property_type:property_type(name),
+          listing_images (
+            image_url
+          ),
+          listing_amenities (
+            amenity_id,
+            amenities(name)
+          )
         `
         )
-        .eq("listing_id", listingId)
+        .eq("listing_id", id)
         .single();
 
-      if (error) {
-        console.error("Error fetching listing:", error.message);
-        return;
-      }
-
-      if (data) {
-        setListing(transformListing(data));
-        console.log(data);
-      }
+      if (error) throw error;
+      console.log("Fetched listing:", data);
+      const transformed = transformListing(data);
+      setListing(transformed);
+    } catch (err: any) {
+      console.error("Error fetching listing:", err.message || err);
+    } finally {
       setLoading(false);
-    };
+    }
+  };
 
-    fetchListing();
-  }, [listingId]);
+  const fetchAmenities = async () => {
+  const { data, error } = await supabase
+    .from("amenities")
+    .select("*")
+    .order("name");
+
+  if (error) console.error("Error fetching amenities:", error.message);
+  else setAmenities(data);
+};
 
   if (loading) {
     return (
@@ -93,14 +118,22 @@ export default function Details() {
     );
   }
 
+  if (!listing) {
+    return (
+      <div className="flex flex-1 items-center justify-center text-gray-600">
+        Não foi possível carregar os dados do anúncio.
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-12 font-heading lg:pr-[240]">
       {/* Fotos */}
-      {listing?.images?.length > 0 && (
+      {listing.images.length > 0 && (
         <div>
-          <ImageGrid images={listing?.images} />
+          <ImageGrid images={listing.images} />
           <div className="flex flex-row flex-wrap gap-2 mt-4">
-            {listing?.images.slice(0, 4).map((img) => (
+            {listing.images.slice(0, 4).map((img) => (
               <div key={img} className="relative w-32 h-32">
                 <Image
                   src={img}
@@ -110,8 +143,8 @@ export default function Details() {
                 />
               </div>
             ))}
-            {listing?.images?.length > 4 && (
-              <MoreImages count={listing?.images?.length - 4} />
+            {listing.images.length > 4 && (
+              <MoreImages count={listing.images.length - 4} />
             )}
           </div>
         </div>
@@ -125,20 +158,13 @@ export default function Details() {
       {/* Título do anúncio */}
       <EditAccordion
         title="Título do anúncio"
-        description={listing?.title ?? "Adicione um título para seu anúncio"}
+        description={listing.title ?? "Adicione um título para seu anúncio"}
         helper="Dá um título ao seu anúncio"
         onSave={() => {}}
       >
         <div className="space-y-8">
-          <div className="flex flex-col">
-            <Input defaultValue={listing?.title ?? ""} />
-          </div>
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Nome interno
-            </label>
-            <Input defaultValue={listing?.name ?? ""} />
-          </div>
+          <InputField label="Título" value={listing.title ?? ""} />
+          <InputField label="Nome interno" value={listing.name ?? ""} />
         </div>
       </EditAccordion>
 
@@ -146,7 +172,7 @@ export default function Details() {
       <EditAccordion
         title="Descrição"
         description={
-          listing?.description ?? "Adicione uma descrição detalhada do imóvel"
+          listing.description ?? "Adicione uma descrição detalhada do imóvel"
         }
         helper="Escreva uma descrição detalhada"
         onSave={() => {}}
@@ -189,6 +215,7 @@ export default function Details() {
           />
         </div>
       </EditAccordion>
+
       <hr className="bg-gray-200 my-6 w-full" />
 
       {/* Localização */}
@@ -208,7 +235,7 @@ export default function Details() {
           <InputField label="Endereço 1" value={listing.street_line1 ?? ""} />
           <InputField label="Endereço 2" value={listing.street_line2 ?? ""} />
           <InputField label="Distrito" value={listing.district?.name ?? ""} />
-          <InputField label="Provincia" value={listing.province?.name ?? ""} />
+          <InputField label="Província" value={listing.province?.name ?? ""} />
           <InputField label="País" value={listing.country?.name ?? ""} />
         </div>
       </EditAccordion>
@@ -252,25 +279,27 @@ export default function Details() {
         <Input defaultValue={listing.location_sharing ?? ""} />
       </EditAccordion>
 
-      <hr className="bg-gray-200 my-6 w-full" />
-
       {/* Comodidades */}
       {listing.amenities.length > 0 && (
-        <EditOnPage
-          title="Comodidades"
-          description="Comodidades disponíveis no imóvel"
-        >
-          <div className="grid grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-2">
-            {listing.amenities.slice(0, 10).map((amenity) => (
-              <div key={amenity} className="text-gray-700 text-md">
-                {amenity}
-              </div>
-            ))}
-          </div>
-          {listing.amenities.length > 10 && (
-            <button className="mt-3 underline">Ver mais</button>
-          )}
-        </EditOnPage>
+        <div>
+          <hr className="bg-gray-200 my-6 w-full" />
+
+          <EditOnPage
+            title="Comodidades"
+            description="Comodidades disponíveis no imóvel"
+          >
+            <div className="grid grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-2">
+              {listing.amenities.slice(0, 10).map((amenity) => (
+                <div key={amenity} className="text-gray-700 text-md">
+                  {amenity}
+                </div>
+              ))}
+            </div>
+            {listing.amenities.length > 10 && (
+              <button className="mt-3 underline">Ver mais</button>
+            )}
+          </EditOnPage>
+        </div>
       )}
 
       <hr className="bg-gray-200 my-6 w-full" />
@@ -282,18 +311,18 @@ export default function Details() {
 
       <EditAccordion
         title="Tipo de propriedade"
-        description={listing.property_type.name ?? ""}
+        description={listing.property_type?.name ?? ""}
         helper="Escolha o tipo de propriedade"
         onSave={() => {}}
       >
         <div className="space-y-2">
           <InputField
             label="Tipo de propriedade"
-            value={listing.property_type.name ?? ""}
+            value={listing.property_type?.name ?? ""}
           />
           <InputField
             label="Tipo de anúncio"
-            value={listing.accommodation_type.name ?? ""}
+            value={listing.accommodation_type?.name ?? ""}
           />
           <InputField
             label="Quantos andares tem o prédio?"
@@ -349,8 +378,8 @@ export default function Details() {
 function transformListing(data: any): ListingWithExtras {
   return {
     ...data,
-    amenities: Array.isArray(data.listings_amenities)
-      ? data.listings_amenities
+    amenities: Array.isArray(data.listing_amenities)
+      ? data.listing_amenities
           .map((la: any) => la?.amenities?.name)
           .filter(Boolean)
       : [],
@@ -359,6 +388,7 @@ function transformListing(data: any): ListingWithExtras {
       : [],
   };
 }
+
 
 /* ------------------- Small UI components ------------------- */
 function Input({
@@ -396,7 +426,7 @@ function InputField({
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <Input defaultValue={value as string} />
+      <Input defaultValue={String(value)} />
     </div>
   );
 }

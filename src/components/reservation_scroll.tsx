@@ -3,17 +3,13 @@
 import { useRef } from "react";
 import ReservationCard from "@/components/reseveration-card";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import { Database } from "../../utils/supabase/models";
 
-interface Reservation {
-  id: number;
-  guest: string;
-  status: string;
-}
-
-interface ReservationScrollProps {
-  reservations: Reservation[];
-  loading?: boolean; // new prop
-}
+type Booking = Database["public"]["Tables"]["bookings"]["Row"];
+type ReservationScrollProps = {
+  reservations: (Booking & { guest: string })[];
+  loading?: boolean;
+};
 
 const ReservationScroll = ({ reservations, loading = false }: ReservationScrollProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -52,13 +48,13 @@ const ReservationScroll = ({ reservations, loading = false }: ReservationScrollP
           <div className="flex gap-4 snap-x snap-mandatory">
             {reservations.map((res, index) => (
               <div
-                key={res.id}
+                key={res.booking_id}
                 className={`flex-shrink-0 w-64 sm:w-72 md:w-80 lg:w-96 snap-start ${
                   index === reservations.length - 1 ? "pr-4" : ""
                 }`}
               >
                 <ReservationCard
-                  title={`Reserva ${res.id + 1}`}
+                  title={`Reserva ${res.booking_id + 1}`}
                   beeva="Beeva Name"
                   guest={res.guest}
                   date="2025-09-10"

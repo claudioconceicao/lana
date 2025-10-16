@@ -35,6 +35,7 @@ export const SessionProvider = ({
   const [isHost, setIsHost] = useState(initIsHost);
   const supabase = createClient();
 
+
   // Load profile
   const loadProfile = async () => {
     setLoading(true);

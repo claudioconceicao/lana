@@ -4,16 +4,19 @@ import { useState, useRef, useEffect } from "react";
 import ListingCard from "@/components/listing_card";
 import SearchBox from "@/components/search_box";
 import { dummy } from "@/database/dummy_data";
+import { Database } from "../../../../utils/supabase/models";
+
+// ✅ Add minimal typing for clarity
+type Listing = Database["public"]["Tables"]["listings"]["Row"];
 
 export default function SearchPage() {
-  const [listings, setListings] = useState(dummy.listings);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(5);
 
-  const mapRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<HTMLDivElement | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
 
-  // 🔥 Adjust itemsPerPage depending on screen size
   useEffect(() => {
     const updateItemsPerPage = () => {
       if (window.innerWidth < 640) {
@@ -33,27 +36,26 @@ export default function SearchPage() {
   // Pagination logic
   const totalPages = Math.ceil(listings.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedListings = listings.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
+  const paginatedListings = listings.slice(startIndex, startIndex + itemsPerPage);
 
   const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
     if (listRef.current) listRef.current.scrollTop = 0;
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
     if (listRef.current) listRef.current.scrollTop = 0;
   };
 
   return (
     <div className="h-screen px-8 flex flex-col">
+      {/* Search bar */}
       <div className="z-50 w-full">
         <SearchBox />
       </div>
-      <div className="flex flex-1 gap-8 mt-2 min-h-0 ">
+
+      <div className="flex flex-1 gap-8 mt-2 min-h-0">
         {/* Listings */}
         <div
           ref={listRef}
@@ -66,7 +68,7 @@ export default function SearchPage() {
 
           <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
             {paginatedListings.map((listing) => (
-              <ListingCard key={listing.id} listing={null} />
+              <ListingCard key={listing.listing_id} listing={listing} />
             ))}
           </div>
 

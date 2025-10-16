@@ -7,9 +7,10 @@ import { FaHeadset, FaStar } from "react-icons/fa";
 import clsx from "clsx";
 import ReservationScroll from "@/components/reservation_scroll";
 import { useRouter, useSearchParams } from "next/navigation";
-import CreateHouse from "./new-listing/page";
+import CreateListing from "./listings/create/page";
 import { createClient } from "../../../../utils/supabase/client";
 import { useSession } from "@/context/SessionContext";
+import { Database } from "../../../../utils/supabase/models";
 
 /* ------------------ Theme ------------------ */
 const themeColors = {
@@ -21,11 +22,16 @@ const themeColors = {
   },
 };
 
+type Listing = Database["public"]["Tables"]["listings"]["Row"];
+type Booking = Database["public"]["Tables"]["bookings"]["Row"];
+
 export default function HomeHosting() {
   const supabase = createClient();
   const { profile } = useSession();
   const [reservations, setReservations] = useState<Booking[]>([]);
-  const [filteredReservations, setFilteredReservations] = useState<Booking[]>([]);
+  const [filteredReservations, setFilteredReservations] = useState<Booking[]>(
+    []
+  );
   const [listings, setListings] = useState<Listing[]>([]);
   const [activeFilter, setActiveFilter] = useState("Convidados actuais");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,16 +47,30 @@ export default function HomeHosting() {
   useEffect(() => {
     const fetchBookings = async () => {
       setIsLoading(true);
-      const { data, error } = await supabase
+      const { data: bookingsData, error } = await supabase
         .from("bookings")
-        .select("booking_id, guest_id, status");
+        .select("*");
 
       if (error) {
         console.error("Error fetching reservations:", error.message);
         setReservations([]);
-      } else if (data) {
-        setReservations(data as Booking[]);
+      } else if (bookingsData) {
+        // Format data for your ReservationScroll component
+        const formatted = bookingsData.map((b) => ({
+          id: b.booking_id,
+          guest: b.guest_id,
+          startDate: b.start_date,
+          endDate: b.end_date,
+          totalPrice: b.total_price,
+          status: b.status,
+          guestsCount: b.guests_count,
+          listingId: b.listing_id,
+          createdAt: b.created_at,
+        }));
+
+        setReservations(formatted as unknown as Booking[]);
       }
+
       setIsLoading(false);
     };
 
@@ -60,14 +80,12 @@ export default function HomeHosting() {
   /* ------------------ Fetch Listings ------------------ */
   useEffect(() => {
     const fetchListings = async () => {
-      const { data, error } = await supabase
-        .from("listings")
-        .select("listing_id, title, status");
+      const { data, error } = await supabase.from("listings").select("*");
 
       if (error) {
         console.error("Error fetching listings:", error.message);
         setListings([]);
-      } else if (data) {
+      } else {
         setListings(data);
       }
     };
@@ -78,8 +96,10 @@ export default function HomeHosting() {
   /* ------------------ Filter Reservations ------------------ */
   useEffect(() => {
     const filtered = reservations.filter((res) => {
-      if (activeFilter === "Convidados actuais") return res.status === "Active";
-      if (activeFilter === "Próximos hóspedes") return res.status === "Upcoming";
+      if (activeFilter === "Convidados actuais")
+        return res.status === "Confirmed";
+      if (activeFilter === "Próximos hóspedes")
+        return res.status === "Confirmed";
       if (activeFilter === "Pendentes") return res.status === "Pending";
       return true;
     });
@@ -89,13 +109,17 @@ export default function HomeHosting() {
 
   /* ------------------ Insert New Listing ------------------ */
   const handleAddListing = async (newHouse: any) => {
-    const { data, error } = await supabase.from("listings").insert({
-      title: newHouse.title,
-      status: "Inactivo",
-      location: newHouse.street_line1 ?? "Luanda / Angola",
-      image: newHouse.image ?? "/images/default.png",
-      host_id: profile?.profile_id, // link listing to logged-in host
-    }).select("*").single();
+    const { data, error } = await supabase
+      .from("listings")
+      .insert({
+        title: newHouse.title,
+        status: "Inactivo",
+        location: newHouse.street_line1 ?? "Luanda / Angola",
+        image: newHouse.image ?? "/images/default.png",
+        host_id: profile?.profile_id,
+      })
+      .select("*")
+      .single();
 
     if (error) {
       console.error("Error creating listing:", error.message);
@@ -128,7 +152,9 @@ export default function HomeHosting() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
         <StatCard
           title="Anúncios Ativos"
-          value={listings.filter((l) => l.status === "Activo").length.toString()}
+          value={listings
+            .filter((l) => l.status === "Listed")
+            .length.toString()}
         />
         <StatCard
           title="Reservas Próximas"
@@ -172,14 +198,7 @@ export default function HomeHosting() {
 
         {/* Horizontal Scrollable Reservations */}
         <div className="overflow-x-auto w-full rounded-lg px-4 scroll-pl-4 scroll-pr-4 scroll-smooth">
-          {filteredReservations.length > 0 ? (
-            <ReservationScroll
-              reservations={filteredReservations}
-              loading={isLoading}
-            />
-          ) : (
-            <EmptyState message="Nenhuma reserva encontrada" />
-          )}
+         
         </div>
       </div>
 
@@ -191,22 +210,13 @@ export default function HomeHosting() {
           Estamos aqui para o ajudar. Entre em contacto com a nossa equipa — num
           click estaremos disponíveis para si.
         </p>
-        <button
-          className={clsx(
-            "px-5 py-2 rounded-full mt-5 border border-transparent font-medium text-sm hover:border-black text-black"
-          )}
-        >
+        <button className="px-5 py-2 rounded-full mt-5 border border-transparent font-medium text-sm hover:border-black text-black">
           Enviar mensagem
         </button>
       </div>
 
       {/* Modal */}
-      {isModalOpen && (
-        <CreateHouse
-          onClose={() => router.push("/hosting/listings/")}
-          onFinish={handleAddListing}
-        />
-      )}
+      {isModalOpen && <CreateListing />}
     </div>
   );
 }

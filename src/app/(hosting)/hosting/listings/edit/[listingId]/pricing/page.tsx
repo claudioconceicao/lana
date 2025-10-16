@@ -148,7 +148,7 @@ export default function Pricing() {
           title={"Taxa de limpeza"}
           description={
             listing.cleaning_fee
-              ? `${listing.cleaning_fee} AOA`
+              ? `AOA ${listing.cleaning_fee}`
               : "Não definido"
           }
           helper="Valor fixo aplicado uma vez por reserva."
@@ -164,7 +164,7 @@ export default function Pricing() {
         <EditAccordion
           title={"Taxa para animais de estimação"}
           description={
-            listing.pet_fee ? `${listing.pet_fee} AOA` : "Sem taxa para animais"
+            listing.pet_fee ? `AOA ${listing.pet_fee}` : "Sem taxa para animais"
           }
           helper="Aplicado uma vez por estadia caso o hóspede leve animais."
           onSave={() => {}}
@@ -180,7 +180,7 @@ export default function Pricing() {
           title={"Taxa por hóspede extra"}
           description={
             listing.extra_guest_fee
-              ? `${listing.extra_guest_fee} AOA por noite por hóspede extra`
+              ? `AOA ${listing.extra_guest_fee} por hóspede extra`
               : "Sem taxa por hóspede extra"
           }
           helper="Aplicada quando o número de hóspedes excede o limite padrão."
@@ -290,8 +290,8 @@ export default function Pricing() {
         <EditAccordion
           title="Dias restritos para Check-in"
           description={
-            listing.restricted_checkin_days?.length
-              ? listing.restricted_checkin_days.join(", ")
+            listing.restrict_checkin_days?.length
+              ? listing.restrict_checkin_days.join(", ")
               : "Nenhum dia restrito"
           }
           helper="Selecione os dias em que os hóspedes não podem iniciar a estadia"
@@ -315,7 +315,7 @@ export default function Pricing() {
                   type="checkbox"
                   value={day}
                   className="accent-black"
-                  defaultChecked={listing.restricted_checkin_days?.includes(
+                  defaultChecked={listing.restrict_checkin_days?.includes(
                     day
                   )}
                 />{" "}
@@ -328,8 +328,8 @@ export default function Pricing() {
         <EditAccordion
           title="Dias restritos para Check-out"
           description={
-            listing.restricted_checkout_days?.length
-              ? listing.restricted_checkout_days.join(", ")
+            listing.restrict_checkout_days?.length
+              ? listing.restrict_checkout_days.join(", ")
               : "Nenhum dia restrito"
           }
           helper="Selecione os dias em que os hóspedes não podem encerrar a estadia"
@@ -353,7 +353,7 @@ export default function Pricing() {
                   type="checkbox"
                   value={day}
                   className="accent-black"
-                  defaultChecked={listing.restricted_checkout_days?.includes(
+                  defaultChecked={listing.restrict_checkout_days?.includes(
                     day
                   )}
                 />{" "}

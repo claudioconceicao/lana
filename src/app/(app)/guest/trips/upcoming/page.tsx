@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "../../../../../../utils/supabase/client";
+import { Database } from "../../../../../../utils/supabase/models";
 
-type Booking = {
+type Bookings = {
   booking_id: string;
   start_date: string;
   end_date: string;
@@ -16,9 +17,11 @@ type Booking = {
   } | null;
 };
 
+type Booking = Database["public"]["Tables"]["bookings"]["Row"];
+
 export default function UpcomingTrips() {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [bookings, setBookings] = useState<any[]>([]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -40,27 +43,31 @@ export default function UpcomingTrips() {
         .from("bookings")
         .select(
           `
-  booking_id,
-  start_date,
-  end_date,
-  status,
-  total_price,
-  guest_count,
-  listing:listings!bookings_listing_id_fkey ( title, location )
-`
+          booking_id,
+          start_date,
+          end_date,
+          status,
+          listing:listings (
+            title,
+            street_line1,
+            street_line2,
+            province:province_id(name),
+            district:district_id(name),
+            municipality:municipality_id(name),
+            country:country_code(name)
+          )
+        `
         )
+        .eq("guest_id", session.user.id)
+        .eq("status", "Confirmed")
+        .lte("end_date", new Date().toISOString())
+        .order("end_date", { ascending: false });
 
-        .eq("user_id", session.user.id)
-        .eq("status", "pending")
-        .gte("start_date", new Date().toISOString())
-        .order("start_date", { ascending: true })
-        .maybeSingle();
       if (error) {
-        console.error(
-          "Error fetching bookings:",
-          JSON.stringify(error, null, 2)
-        );
+        console.error("Error fetching bookings:", JSON.stringify(error, null, 2));
+        setBookings([]);
       } else {
+        console.log("Bookings fetched:", data);
         setBookings(data || []);
       }
 
@@ -72,8 +79,13 @@ export default function UpcomingTrips() {
 
   if (loading) {
     return (
-      <div className="flex-1 justify-center text-center items-center py-20 text-gray-500">
-        Carregando suas viagens...
+      <div className="flex justify-center">
+        <div className="w-full py-16">
+           <div className="flex flex-col justify-center text-center items-center py-20 text-gray-500">
+          Carregando suas viagens...
+          </div>
+        </div>
+       
       </div>
     );
   }

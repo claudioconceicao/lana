@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { IoMdAdd } from "react-icons/io";
 import { useRouter, useSearchParams } from "next/navigation";
-import CreateHouse from "../new-listing/page";
+import CreateListing from "./create/page";
 import { createClient } from "../../../../../utils/supabase/client";
 import { useSession } from "@/context/SessionContext";
 import { LoaderCircle } from "lucide-react";
@@ -27,7 +27,9 @@ const ListingList = () => {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"Draft" | "Listed" | "Unlisted">("Draft");
+  const [statusFilter, setStatusFilter] = useState<
+    "Draft" | "Listed" | "Unlisted"
+  >("Draft");
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -40,7 +42,8 @@ const ListingList = () => {
 
       const { data: listingsData, error } = await supabase
         .from("listings")
-        .select(`
+        .select(
+          `
           listing_id,
           title,
           status,
@@ -49,7 +52,8 @@ const ListingList = () => {
           municipality:municipality_id(name),
           province:province_id(name),
           country:country_code(name)
-        `)
+        `
+        )
         .eq("host_id", user?.id);
 
       if (error) {
@@ -60,11 +64,17 @@ const ListingList = () => {
             listing_id: l.listing_id,
             title: l.title,
             status: l.status ?? "Unlisted",
-            location: `${l.municipality?.name ?? ""}, ${l.province?.name ?? ""}, ${l.country?.name ?? ""}`,
+            location: `${l.municipality?.name ?? ""}, ${
+              l.province?.name ?? ""
+            }, ${l.country?.name ?? ""}`,
             created_at: l.created_at,
             image: "/images/default.png",
           }))
-          .sort((a: Listing, b: Listing) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()); // mais recentes primeiro
+          .sort(
+            (a: Listing, b: Listing) =>
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+          ); // mais recentes primeiro
 
         setListings(mapped);
       }
@@ -75,9 +85,7 @@ const ListingList = () => {
   }, [profile?.profile_id, supabase]);
 
   const filteredListings = listings
-    .filter((l) =>
-      l.title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    .filter((l) => l.title.toLowerCase().includes(searchTerm.toLowerCase()))
     .filter((l) =>
       statusFilter === "Draft" ? true : l.status === statusFilter
     );
@@ -96,21 +104,20 @@ const ListingList = () => {
       <div className="flex flex-row items-center justify-between mb-6">
         <h1 className="text-2xl md:text-3xl font-semibold">Seus Anúncios</h1>
         <div className="flex flex-row justify-end items-center space-x-4">
-           <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Procurar anúncios"
-          className="block pl-3 h-10 w-full md:w-64 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:bg-gray-100 mb-2 md:mb-0"
-        />
-         <button
-          onClick={() => router.push("?new-listing=modal")}
-          className="bg-gray-100/30 shadow border border-gray-200 hover:shadow-lg rounded-full w-12 h-12 flex items-center justify-center"
-        >
-          <IoMdAdd />
-        </button>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Procurar anúncios"
+            className="block pl-3 h-10 w-full md:w-64 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:bg-gray-100 mb-2 md:mb-0"
+          />
+          <button
+            onClick={() => router.push("?new-listing=modal")}
+            className="bg-gray-100/30 shadow border border-gray-200 hover:shadow-lg rounded-full w-12 h-12 flex items-center justify-center"
+          >
+            <IoMdAdd />
+          </button>
         </div>
-       
       </div>
 
       {/* Desktop Table */}
@@ -140,24 +147,7 @@ const ListingList = () => {
       </div>
 
       {/* Modal */}
-      {isModalOpen && (
-        <CreateHouse
-          onClose={() => router.push("/hosting/listings/")}
-          onFinish={(newHouse: any) =>
-            setListings((prev) => [
-              ...prev,
-              {
-                listing_id: newHouse.listing_id,
-                title: newHouse.title,
-                status: "Inactive",
-                location: newHouse.location ?? "Luanda / Angola",
-                created_at: new Date().toISOString(),
-                image: newHouse.image ?? "/images/default.png",
-              },
-            ])
-          }
-        />
-      )}
+      {isModalOpen && <CreateListing />}
     </div>
   );
 };
@@ -169,7 +159,9 @@ const ListingRow = ({ listing }: { listing: Listing }) => {
   const router = useRouter();
   return (
     <tr
-      onClick={() => router.push(`/hosting/listings/edit/${listing.listing_id}/details`)}
+      onClick={() =>
+        router.push(`/hosting/listings/edit/${listing.listing_id}/details`)
+      }
       className="cursor-pointer hover:bg-gray-100 h-20"
     >
       <td className="border-b border-gray-200 py-2 px-4">
@@ -206,7 +198,9 @@ const ListingCard = ({ listing }: { listing: Listing }) => {
   const router = useRouter();
   return (
     <div
-      onClick={() => router.push(`/hosting/listings/${listing.listing_id}/edit/details`)}
+      onClick={() =>
+        router.push(`/hosting/listings/${listing.listing_id}/edit/details`)
+      }
       className="bg-white border border-gray-200 rounded-lg p-4 flex items-start space-x-4 cursor-pointer hover:shadow"
     >
       <Image

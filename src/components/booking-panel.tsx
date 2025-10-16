@@ -2,6 +2,7 @@
 
 import { HeartIcon } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 interface BookingPanelProps {
   listing_id: string;
@@ -9,6 +10,10 @@ interface BookingPanelProps {
 }
 
 const BookingPanel = ({ listing_id, listing_price = 0 }: BookingPanelProps) => {
+  
+  const [dates, setDates] = useState("Not selected");
+  const [guests, setGuests] = useState("1");
+
   return (
     <div id="booking-panel" className="relative w-full">
       <section
@@ -40,7 +45,7 @@ const BookingPanel = ({ listing_id, listing_price = 0 }: BookingPanelProps) => {
         {/* add conditional UI when dates are set */}
         
         <Link
-          href={`/homes/${listing_id}/book/`}
+          href={`/homes/${listing_id}/book?dates=${dates}&guests=${guests}`}
           className="w-full flex-1 text-center font-semibold bg-orange-300 p-4 rounded-lg"
         >
           Verificar disponibilidade

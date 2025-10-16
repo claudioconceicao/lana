@@ -5,9 +5,9 @@ import { cookies } from "next/headers";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { listingId: string } }
+  { params }: { params: Promise<{ listingId: string }> }
 ) {
-  const { listingId } = params;
+  const { listingId } = await params;
 
   // Fetch reservations for this listing
   const supabase = createClient(cookies());
@@ -26,14 +26,14 @@ export async function GET(
     timezone: "UTC",
   });
 
-  reservations?.forEach((res) => {
-    calendar.createEvent({
-      start: new Date(res.start_date),
-      end: new Date(res.end_date),
-      summary: `Reserva - ${res.guest.name || "Hóspede"}`,
-      id: `reservation-${res.id}@beeva.ao`,
-    });
-  });
+  // reservations?.forEach((res) => {
+  //   calendar.createEvent({
+  //     start: new Date(res.start_date),
+  //     end: new Date(res.end_date),
+  //     summary: `Reserva - ${res.guest.name || "Hóspede"}`,
+  //     id: `reservation-${res.id}@beeva.ao`,
+  //   });
+  // });
 
   // Return ICS file
   return new NextResponse(calendar.toString(), {

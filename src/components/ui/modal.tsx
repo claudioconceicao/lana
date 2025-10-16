@@ -18,18 +18,19 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
   }, []);
 
   useEffect(() => {
-    function handlerClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: globalThis.MouseEvent) {
       if (
         modalRef.current &&
         !modalRef.current.contains(event.target as Node) &&
-        isOpen) {
+        isOpen
+      ) {
         onClose();
       }
     }
-    document.addEventListener("click", handlerClickOutside);
 
+    document.addEventListener("click", handleClickOutside);
     return () => {
-      document.removeEventListener("click", handlerClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, [isOpen, onClose]);
 

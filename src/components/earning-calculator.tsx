@@ -1,20 +1,24 @@
 "use client";
 import { useState } from "react";
 
+type City = "Luanda" | "Benguela" | "Lubango" | "Huambo" | string;
+
 export default function EarningCalculator() {
   const [city, setCity] = useState("Luanda");
   const [nights, setNights] = useState(5);
 
   // Valores médios fictícios por cidade (Kz/noite)
-  const cityRates = {
+
+  const cityRates: Record<City, number> = {
     Luanda: 97000,
     Benguela: 67000,
     Lubango: 54000,
     Huambo: 29000,
   };
 
-  const pricePerNight = cityRates[city] || 10000;
-  const estimated = nights * pricePerNight;
+  const pricePerNight = (city: City): number => cityRates[city] ?? 10000;
+
+  const estimated = nights * pricePerNight(city);
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-md max-w-7xl w-full mx-auto flex flex-col md:flex-row gap-6 md:gap-12">

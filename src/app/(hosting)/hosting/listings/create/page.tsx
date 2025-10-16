@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, ReactNode } from "react";
-import logo from "../../../../../public/logo.svg";
+import logo from "../../../../../../public/logo.svg";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { XMarkIcon } from "@heroicons/react/24/solid";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
-import { createClient } from "../../../../../utils/supabase/client";
+import { createClient } from "../../../../../../utils/supabase/client";
 
 const Message = dynamic(() => import("./steps/message"), { ssr: false });
 const StepOne = dynamic(() => import("./steps/step-one"), { ssr: false });
@@ -23,13 +24,9 @@ const StepNine = dynamic(() => import("./steps/step-nine"), { ssr: false });
 const StepTen = dynamic(() => import("./steps/step-ten"), { ssr: false });
 const Resume = dynamic(() => import("./steps/resume"), { ssr: false });
 
-export default function CreateHouse({
-  onClose,
-  onFinish,
-}: {
-  onClose: () => void;
-  onFinish: (newHouse: any) => void;
-}) {
+export default function CreateListing() {
+
+  const router = useRouter();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(0); // 1 = next, -1 = back
   const [loading, setLoading] = useState(false);
@@ -52,6 +49,14 @@ export default function CreateHouse({
     postalCode: "",
     country: "",
   });
+
+  function onCloseModal() {
+    return router.back();
+  }
+
+  function onFinishModal(newHouse: any) {
+    return router.push(`/hosting/listings/${newHouse.listing_id}/edit`);
+  }
 
   const resetForm = () => {
     setStep(0);
@@ -99,7 +104,7 @@ export default function CreateHouse({
       value={accommodationInfo}
       onChange={setAccommodationInfo}
     />,
-    <StepFive key="step5" value={""} onChange={() => {}} />,
+    <StepFive key="step5" value={houseType} onChange={setHouseType} />,
     <StepSix key="step6" value={price} onChange={setPrice} />,
     <StepSeven key="step7" value={amenities} onChange={setAmenities} />,
     <StepEight key="step8" value={address} onChange={setAddress} />,
@@ -139,17 +144,16 @@ export default function CreateHouse({
     const { data, error } = await supabase
       .from("listings")
       .insert({
-        title,
-        description,
+        title:title,
+        description:description,
         status: "Activo",
         location: address.city || "Desconhecido",
-        image: "/default-house.jpg",
-        price,
+        houseType:houseType,
+        price:price,
         guests: accommodationInfo.guests,
         bedrooms: accommodationInfo.bedrooms,
         beds: accommodationInfo.beds,
         bathrooms: accommodationInfo.bathrooms,
-        amenities,
         street: address.street,
         postal_code: address.postalCode,
         country: address.country,
@@ -164,9 +168,9 @@ export default function CreateHouse({
       return;
     }
 
-    onFinish(data);
+    onFinishModal(data);
     resetForm();
-    onClose();
+    onCloseModal();
   };
 
   const getButton = () => {
@@ -230,7 +234,7 @@ export default function CreateHouse({
           <button
             onClick={() => {
               resetForm();
-              onClose();
+              onCloseModal();
             }}
             className="text-gray-600 text-lg hover:text-black cursor-pointer hover:font-bold transition-colors"
             aria-label="Fechar"

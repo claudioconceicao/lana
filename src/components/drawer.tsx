@@ -1,4 +1,3 @@
-import { Button} from "@geist-ui/core";
 import { useState, type JSX } from "react";
 
 export function Component(): JSX.Element {

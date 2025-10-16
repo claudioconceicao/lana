@@ -366,39 +366,6 @@ export type Database = {
           },
         ]
       }
-      favorites: {
-        Row: {
-          created_at: string | null
-          listing_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          listing_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          listing_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "favorites_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["listing_id"]
-          },
-          {
-            foreignKeyName: "favorites_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["profile_id"]
-          },
-        ]
-      }
       host_payouts: {
         Row: {
           amount: number
@@ -431,6 +398,36 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      listing_amenities: {
+        Row: {
+          amenity_id: number
+          listing_id: string
+        }
+        Insert: {
+          amenity_id: number
+          listing_id: string
+        }
+        Update: {
+          amenity_id?: number
+          listing_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listings_amenities_amenity_id_fkey"
+            columns: ["amenity_id"]
+            isOneToOne: false
+            referencedRelation: "amenities"
+            referencedColumns: ["amenity_id"]
+          },
+          {
+            foreignKeyName: "listings_amenities_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["listing_id"]
           },
         ]
       }
@@ -584,7 +581,6 @@ export type Database = {
           province_id: number
           restrict_checkin_days: string[] | null
           restrict_checkout_days: string[] | null
-          restricted_checkout_days: string[] | null
           status: Database["public"]["Enums"]["listing_status"] | null
           street_line1: string
           street_line2: string | null
@@ -637,7 +633,6 @@ export type Database = {
           province_id: number
           restrict_checkin_days?: string[] | null
           restrict_checkout_days?: string[] | null
-          restricted_checkout_days?: string[] | null
           status?: Database["public"]["Enums"]["listing_status"] | null
           street_line1: string
           street_line2?: string | null
@@ -690,7 +685,6 @@ export type Database = {
           province_id?: number
           restrict_checkin_days?: string[] | null
           restrict_checkout_days?: string[] | null
-          restricted_checkout_days?: string[] | null
           status?: Database["public"]["Enums"]["listing_status"] | null
           street_line1?: string
           street_line2?: string | null
@@ -762,36 +756,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "provinces"
             referencedColumns: ["province_id"]
-          },
-        ]
-      }
-      listings_amenities: {
-        Row: {
-          amenity_id: number
-          listing_id: string
-        }
-        Insert: {
-          amenity_id: number
-          listing_id: string
-        }
-        Update: {
-          amenity_id?: number
-          listing_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "listings_amenities_amenity_id_fkey"
-            columns: ["amenity_id"]
-            isOneToOne: false
-            referencedRelation: "amenities"
-            referencedColumns: ["amenity_id"]
-          },
-          {
-            foreignKeyName: "listings_amenities_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["listing_id"]
           },
         ]
       }
@@ -1288,6 +1252,39 @@ export type Database = {
           {
             foreignKeyName: "verification_documents_reviewed_by_fkey"
             columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      wishlists: {
+        Row: {
+          created_at: string | null
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          listing_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["listing_id"]
+          },
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]

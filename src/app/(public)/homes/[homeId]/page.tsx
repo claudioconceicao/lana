@@ -1,15 +1,29 @@
-
 "use client";
 import BookingPanel from "@/components/booking-panel";
 import CustomNavBar from "@/components/custom_navbar";
 import ImageGrid from "@/components/image-grid";
-import { CheckCircleIcon, StarIcon } from "lucide-react";
+import { CheckCircleIcon, LoaderCircle, StarIcon } from "lucide-react";
 import Link from "next/link";
 import RegularNav from "@/components/regular_nav";
 import { homedir } from "os";
-import { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
+import { createClient } from "../../../../../utils/supabase/client";
+import { Database } from "../../../../../utils/supabase/models";
 
-const ListingDetail = ({ params }: { params: { homeId: string } }) => {
+
+type Listing = Database['public']['Tables']['listings']['Row'];
+type ListingWithExtras = Listing & {
+  amenities: string[];
+  images: string[];
+  province?: { name: string } | null;
+  municipality?: { name: string } | null;
+  district?: { name: string } | null;
+  property_type?: { name: string } | null;
+  accommodation_type?: { name: string } | null;
+  country?: { name: string } | null;
+};
+
+export default function ListingDetail({ params }: { params: Promise<{ homeId: string }> }){
   const amenities = [
     "Wifi",
     "Kitchen",
@@ -23,27 +37,104 @@ const ListingDetail = ({ params }: { params: { homeId: string } }) => {
     "Hangers",
   ];
 
+  const {homeId} = React.use(params);
   const stopRef = useRef<HTMLDivElement | null>(null);
+  const [listing, setListing] = useState<Listing | null>(null);
+  const [loading, setLoading] = useState(false);
+  const supabase = createClient();
 
-  const listing = {}
+  const listingId = homeId;
+
+  useEffect(() => {
+    if (!listingId) return;
+    fetchListing(listingId);
+  }, [listingId]);
+
+  /**
+   * Fetches full listing data including related tables
+   */
+  const fetchListing = async (id: string) => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("listings")
+        .select(
+          `
+            listing_id,
+            title,
+            name,
+            description,
+            base_price,
+            status,
+            city,
+            street_line1,
+            street_line2,
+            max_guests,
+            no_of_bedrooms,
+            no_of_beds,
+            no_of_bathrooms,
+            building_floors,
+            floor,
+            neighbourhood_description,
+            getting_around,
+            location_sharing,
+            province:province_id(name),
+            country:country_code(name),
+            district:district_id(name),
+            municipality:municipality_id(name),
+            accommodation_type:accommodation_type(name),
+            property_type:property_type(name),
+            listing_images (
+              image_url
+            ),
+            listing_amenities (
+              amenity_id,
+              amenities(name)
+            )
+          `
+        )
+        .eq("listing_id", id)
+        .single();
+
+      if (error) throw error;
+      console.log("Fetched listing:", data);
+      const transformed = transformListing(data);
+      setListing(transformed);
+    } catch (err: any) {
+      console.error("Error fetching listing:", err.message || err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="flex flex-col items-center justify-center h-screen">
+      <LoaderCircle className="animate-spin mx-auto mt-8" size={48} />;
+    </div>
+  }
+
   return (
     <div className="">
-     <div id="images">
-       <ImageGrid images={[
-    "/images/luanda_night.jpg",
-    "/images/luanda_sky.jpg",
-    "/images/luanda_sky.jpg",
-    "/images/luanda_sky.jpg",
-  ]}/>
-     </div>
+      <div id="images">
+        <ImageGrid
+          images={[
+            "/images/luanda_night.jpg",
+            "/images/luanda_sky.jpg",
+            "/images/luanda_sky.jpg",
+            "/images/luanda_sky.jpg",
+          ]}
+        />
+      </div>
       <CustomNavBar />
       <div className="relative grid grid-cols-3 gap-8 mx-[150] mt-8">
         <div id="description" className="col-span-2 max-w-[600px]">
           <div>
-            <h1 className="text-2xl font-semibold">Listing Title</h1>
+            <h1 className="text-2xl font-semibold">{listing?.title}</h1>
             <p className="flex items-center">
-              2 bedroom <span> &#160; &#8226; &#160;</span>2 beds{" "}
-              <span>&#160; &#8226; &#160;</span>1 bath
+              {listing?.no_of_bedrooms} bedroom <span> &#160; &#8226; &#160;</span>
+              {listing?.no_of_beds} beds{" "}
+              <span>&#160; &#8226; &#160;</span>
+              {listing?.no_of_bathrooms} bath
             </p>
           </div>
           <div className="mt-8">
@@ -71,7 +162,10 @@ const ListingDetail = ({ params }: { params: { homeId: string } }) => {
             </button>
           </div>
         </div>
-        <BookingPanel listing_id={"0"} listing_price={0}  />
+        <BookingPanel
+          listing_id={listing?.listing_id as string}
+          listing_price={listing?.base_price || 0}
+        />
       </div>
       <div ref={stopRef} id="location" className="mx-[150] mt-8">
         <h2 className="text-2xl font-semibold mt-4">Sobre a banda</h2>
@@ -169,4 +263,17 @@ const ListingDetail = ({ params }: { params: { homeId: string } }) => {
   );
 };
 
-export default ListingDetail;
+
+function transformListing(data: any): ListingWithExtras {
+  return {
+    ...data,
+    amenities: Array.isArray(data.listing_amenities)
+      ? data.listing_amenities
+          .map((la: any) => la?.amenities?.name)
+          .filter(Boolean)
+      : [],
+    images: Array.isArray(data.listing_images)
+      ? data.listing_images.map((img: any) => img?.image_url).filter(Boolean)
+      : [],
+  };
+}

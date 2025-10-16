@@ -83,7 +83,6 @@ export default function Resume({
         <section
           key={section.key}
           className="bg-white rounded-lg shadow overflow-hidden"
-          ref={(el) => (sectionRefs.current[section.key] = el)}
         >
           <button
             className="flex justify-between w-full items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 transition text-left"

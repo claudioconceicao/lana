@@ -3,44 +3,29 @@
 import { ChangeEvent, useState } from "react";
 import MessageCard from "@/components/message-card";
 import Chat from "@/components/chat";
+import { Database } from "../../../../../utils/supabase/models";
 
+
+type Message = Database["public"]["Tables"]["messages"]["Row"];
 
 const mockMessages: Message[] = [
-  {
-    id: 0,
-    sender: "João",
-    preview: "Olá, ainda está disponível?",
-    time: "Ontem",
-  },
-  {
-    id: 1,
-    sender: "Maria",
-    preview: "Gostaria de reservar...",
-    time: "2 dias atrás",
-  },
-  {
-    id: 2,
-    sender: "Carlos",
-    preview: "Posso fazer check-in mais cedo?",
-    time: "1 semana atrás",
-  },
 ];
 
 const Messages = () => {
-  const [selectedMessageId, setSelectedMessageId] = useState<number | null>(
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
     null
   );
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSelectMessage = (id: number) => {
+  const handleSelectMessage = (id: string) => {
     setSelectedMessageId(id);
   };
 
   // Filter messages
   const filteredMessages = mockMessages.filter(
     (msg) =>
-      msg.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      msg.preview.toLowerCase().includes(searchQuery.toLowerCase())
+      msg.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      msg.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -69,10 +54,10 @@ const Messages = () => {
             <ul className="space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
               {filteredMessages.length > 0 ? (
                 filteredMessages.map((msg) => (
-                  <li key={msg.id}>
+                  <li key={msg.chat_id}>
                     <MessageCard
-                      selected={selectedMessageId === msg.id}
-                      onClick={() => handleSelectMessage(msg.id)}
+                      selected={selectedMessageId === msg.message_id}
+                      onClick={() => handleSelectMessage(msg.message_id)}
                     />
                   </li>
                 ))

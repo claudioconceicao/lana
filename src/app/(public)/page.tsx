@@ -48,8 +48,8 @@ export default function HomePage() {
 
   const handleHomeTypeChange = (type: string) => {
     setHomeType(type);
-    setLoading(true); // ✅ ensures shimmer shows immediately
-    setListings([]); // ✅ optional: clear stale results right away
+    setLoading(true);
+    setListings([]);
   };
 
   const fetchListings = useCallback(
@@ -64,18 +64,21 @@ export default function HomePage() {
     title,
     base_price,
     property_types(name),
-    listings_amenities(amenities(name)),
+    listing_amenities (
+      amenity_id,
+      amenities(name)
+    ),
     listing_ratings(average_rating, review_count)
-  `
+    `
         )
         .limit(6);
 
       // amenity-based filters
       if (filter === "Piscinas") {
-        query = query.eq("listings_amenities.amenities.name", "Piscina");
+        query = query.eq("listing_amenities.amenities.name", "Piscina");
       }
       if (filter === "Vistas incriveis") {
-        query = query.eq("listings_amenities.amenities.name", "Vista incrível");
+        query = query.eq("listing_amenities.amenities.name", "Vista incrível");
       }
 
       // property type filters
@@ -88,7 +91,7 @@ export default function HomePage() {
 
       // location_tag filter
       if (filter === "Em frente à praia") {
-        query = query.eq("location_tag", "Em frente à praia"); 
+        query = query.eq("location_tag", "Em frente à praia");
       }
 
       const { data, error } = await query;

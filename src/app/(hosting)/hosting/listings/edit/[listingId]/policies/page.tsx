@@ -340,8 +340,8 @@ export default function Details() {
 function transformListing(data: any): ListingWithExtras {
   return {
     ...data,
-    amenities: Array.isArray(data.listings_amenities)
-      ? data.listings_amenities
+    amenities: Array.isArray(data.listing_amenities)
+      ? data.listing_amenities
           .map((la: any) => la?.amenities?.name)
           .filter(Boolean)
       : [],
