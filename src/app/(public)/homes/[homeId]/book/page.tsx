@@ -3,13 +3,21 @@ import BookingSummary from "./booking_summary";
 import PaymentDetails from "./payment_details";
 import ConfirmButton from "./confirmation_button";
 import React from "react";
+import { createClient } from "@/lib/supabase/client";
 
-// ✅ For static export (required)
 export const dynamic = "force-static";
 
 export async function generateStaticParams() {
-  // Replace with your real data later if needed
-  return [{ homeId: "1" }];
+  const supabase = createClient();
+  const { data: listings } = await supabase
+    .from("listings")
+    .select("id");
+
+  return (
+    listings?.map((listing) => ({
+      homeId: listing.id.toString(),
+    })) || []
+  );
 }
 
 export default function BookingPage({
@@ -19,7 +27,8 @@ export default function BookingPage({
   params: Promise<{ homeId: string }>;
   searchParams: Promise<{ dates?: string; guests?: string }>;
 }) {
-  // ✅ Unwrap params and searchParams using React.use()
+
+
   const resolvedParams = React.use(params);
   const resolvedSearch = React.use(searchParams);
 
