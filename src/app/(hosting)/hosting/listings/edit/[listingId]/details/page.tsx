@@ -38,12 +38,6 @@ export default function Details() {
   const params = useParams();
   const listingId = params?.listingId as string;
 
-  useEffect(() => {
-    if (!listingId) return;
-    fetchListing(listingId);
-    fetchAmenities();
-  }, [listingId]);
-
   /**
    * Fetches full listing data including related tables
    */
@@ -109,6 +103,13 @@ export default function Details() {
   if (error) console.error("Error fetching amenities:", error.message);
   else setAmenities(data);
 };
+
+
+  useEffect(() => {
+    if (!listingId) return;
+    fetchListing(listingId);
+    fetchAmenities();
+  }, []);
 
   if (loading) {
     return (

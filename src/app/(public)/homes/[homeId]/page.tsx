@@ -48,7 +48,7 @@ export default function ListingDetail({ params }: { params: Promise<{ homeId: st
   useEffect(() => {
     if (!listingId) return;
     fetchListing(listingId);
-  }, [listingId]);
+  }, []);
 
   /**
    * Fetches full listing data including related tables

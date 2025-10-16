@@ -83,7 +83,7 @@ const PersonalInformation = () => {
     };
 
     fetchData();
-  }, [profile?.profile_id, supabase]);
+  }, [profile.birth_date, profile.first_name, profile.last_name, profile.phone_number, profile?.profile_id, supabase]);
 
   // handle profile form changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
