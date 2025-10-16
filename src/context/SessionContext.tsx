@@ -88,7 +88,7 @@ export const SessionProvider = ({
     return () => {
       subscription.subscription.unsubscribe();
     };
-  }, []);
+  }, [loadProfile, supabase.auth]);
 
   return (
     <SessionContext.Provider value={{ profile, loading, isHost }}>
