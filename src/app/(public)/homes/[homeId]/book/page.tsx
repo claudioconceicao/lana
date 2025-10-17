@@ -8,6 +8,7 @@ import { Database } from "@/lib/supabase/models";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { LoaderCircle } from "lucide-react";
 
 type Listing = Database["public"]["Tables"]["listings"]["Row"];
 interface BookingPageProps {
@@ -56,8 +57,14 @@ export default function BookingPage({
   }, [homeId, supabase]);
 
 
-  if(loading){
-    return <div>Loading...</div>;
+   if (loading) {
+    return (
+      <div className="flex h-screen">
+        <div className="absolute h-screen w-full inset-0 flex justify-center items-center bg-white/60 z-50">
+          <LoaderCircle className="animate-spin w-12 h-12" />
+        </div>
+      </div>
+    );
   }
   return (
     <div className="mx-[150px] p-8">
