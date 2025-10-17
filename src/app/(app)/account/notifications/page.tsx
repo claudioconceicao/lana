@@ -1,6 +1,14 @@
 "use client";
 import { useState } from "react";
 
+export async function generateStaticParams() {
+  // Replace with your own data or hardcoded IDs
+  return [
+    { accountId: "1" },
+    { accountId: "2" },
+    { accountId: "3" },
+  ];
+}
 const Notifications = () => {
   const [emailNotif, setEmailNotif] = useState(true);
   const [smsNotif, setSmsNotif] = useState(false);
