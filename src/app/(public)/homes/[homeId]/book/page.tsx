@@ -10,6 +10,6 @@ export async function generateStaticParams() {
   ];
 }
 
-export default function BookingPage({ params }: { params: { homeId: string } }) {
+export default function BookingPage() {
   return <BookingClient  />;
 }
