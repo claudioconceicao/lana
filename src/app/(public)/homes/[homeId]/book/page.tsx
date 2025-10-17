@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -11,6 +12,18 @@ import { createClient } from "@/lib/supabase/client";
 import { LoaderCircle } from "lucide-react";
 
 type Listing = Database["public"]["Tables"]["listings"]["Row"];
+export async function generateStaticParams() {
+  const res = await fetch("https://beeva.supabase.co/rest/v1/listings", {
+    headers: {
+      apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    },
+  });
+  const homes = await res.json();
+
+  return homes.map((home: any) => ({
+    homeId: home.listing_id.toString(),
+  }));
+}
 
 export default function BookingPage() {
   const supabase = createClient();
