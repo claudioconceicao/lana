@@ -11,12 +11,8 @@ import { createClient } from "@/lib/supabase/client";
 import { LoaderCircle } from "lucide-react";
 
 type Listing = Database["public"]["Tables"]["listings"]["Row"];
-interface BookingPageProps {
-  searchParams?: { startDate?: string; endDate?: string; guests?: string };
-}
-export default function BookingPage({
-  searchParams,
-}: BookingPageProps) {
+
+export default function BookingPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
 
