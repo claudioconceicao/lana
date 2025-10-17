@@ -9,3 +9,8 @@
 # Optional: force Next.js runtime on Netlify
 [functions]
   node_bundler = "esbuild"
+
+  [[redirects]]
+      from = "/*"
+      to = "/index.html"
+      status = 200
