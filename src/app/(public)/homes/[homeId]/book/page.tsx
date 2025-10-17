@@ -1,26 +1,64 @@
+"use client";
+
 import Image from "next/image";
 import BookingSummary from "./booking_summary";
 import PaymentDetails from "./payment_details";
 import ConfirmButton from "./confirmation_button";
-import { createClient } from "@/lib/supabase/client";
 import { Database } from "@/lib/supabase/models";
-
-interface BookingPageProps {
-  params: { listing: Listing };
-  searchParams?: { dates?: string; guests?: string };
-}
+import { useParams, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 type Listing = Database["public"]["Tables"]["listings"]["Row"];
-
-export default async function BookingPage({
+interface BookingPageProps {
+  params: { listing: Listing };
+  searchParams?: { startDate?: string; endDate?: string; guests?: string };
+}
+export default function BookingPage({
   params,
   searchParams,
 }: BookingPageProps) {
   const supabase = createClient();
-  const dates = searchParams?.dates ?? "Not selected";
-  const guests = searchParams?.guests ?? "1";
+  const [loading, setLoading] = useState(false);
 
-  const listing = params.listing;
+  const { homeId } = useParams<{ homeId: string }>();
+  const startDate = useSearchParams().get("startDate") ?? "";
+  const endDate = useSearchParams().get("endDate") ?? "";
+  const dates = { startDate, endDate };
+  const guests = useSearchParams().get("guests") ?? "1";
+
+  const [listing, setListing] = useState<Listing | null>(null);
+
+  console.log("homeId:", homeId);
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchListing = async (id: string) => {
+      // fetch listing details if needed
+      const { data, error } = await supabase
+        .from("listings")
+        .select("*")
+        .eq("listing_id", homeId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching listing:", error);
+        setLoading(false);
+      } else {
+        setListing(data);
+        setLoading(false);
+      }
+    };
+
+    if (homeId) {
+      fetchListing(homeId);
+    }
+  }, [homeId, supabase]);
+
+
+  if(loading){
+    return <div>Loading...</div>;
+  }
   return (
     <div className="mx-[150px] p-8">
       <h1 className="font-heading text-3xl mb-6 font-semibold">Reservar</h1>
@@ -70,11 +108,7 @@ function HouseRules() {
   );
 }
 
-function ListingSummary({
-  listing,
-}: {
-  listing: Listing;
-}) {
+function ListingSummary({ listing }: { listing: Listing | null }) {
   return (
     <div className="border w-full rounded-lg p-4 shadow-sm">
       <div className="flex flex-row gap-4 items-center">
@@ -86,8 +120,10 @@ function ListingSummary({
           className="rounded-lg object-cover"
         />
         <div>
-          <h2 className="font-semibold">{listing.title}</h2>
-          <p className="text-sm text-gray-500">Listing ID: {listing.listing_id}</p>
+          <h2 className="font-semibold">{listing?.title}</h2>
+          <p className="text-sm text-gray-500">
+            Listing ID: {listing?.listing_id}
+          </p>
         </div>
       </div>
     </div>

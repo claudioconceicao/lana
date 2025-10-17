@@ -3,14 +3,22 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Pencil } from "lucide-react";
 
-export default function BookingSummary({ dates, guests }: { dates?: string; guests?: string }) {
+export default function BookingSummary({
+  dates,
+  guests,
+}: {
+  dates?: { startDate?: string; endDate?: string };
+  guests?: string;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [noOfGuests, setGuest] = useState(guests ?? "1");
   const [rangeDate, setRangeDate] = useState(dates ?? "Não selecionado");
 
-  const [editingField, setEditingField] = useState<"dates" | "guests" | null>(null);
+  const [editingField, setEditingField] = useState<"dates" | "guests" | null>(
+    null
+  );
   const [tempValue, setTempValue] = useState("");
 
   // helper to update query params in URL
@@ -47,12 +55,10 @@ export default function BookingSummary({ dates, guests }: { dates?: string; gues
         <div className="flex items-center justify-between">
           <div>
             <p className="font-medium">Datas:</p>
-            <p>{rangeDate}</p>
           </div>
           <button
             onClick={() => {
               setEditingField("dates");
-              setTempValue(rangeDate);
             }}
             className="text-sm hover:underline flex items-center gap-1"
           >
