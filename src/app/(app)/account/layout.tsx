@@ -12,6 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       href: `/account/${id}/payment-method`,
       icon: CreditCard,
     },
+    
     {
       name: "Login e Segurança",
       href: `/account/${id}/login-and-security`,
