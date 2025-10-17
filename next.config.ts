@@ -1,17 +1,11 @@
-import { netlifyPlugin } from "@netlify/next";
-
-
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  
-  reactStrictMode: true,
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**.supabase.co",
-      },
-    ],
+  output: 'standalone',
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['*'],
+    },
   },
 };
 
-export default netlifyPlugin(nextConfig);
+export default nextConfig;
