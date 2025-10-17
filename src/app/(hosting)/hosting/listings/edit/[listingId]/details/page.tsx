@@ -95,26 +95,25 @@ export default function Details() {
   };
 
   const fetchAmenities = async () => {
-  const { data, error } = await supabase
-    .from("amenities")
-    .select("*")
-    .order("name");
+    const { data, error } = await supabase
+      .from("amenities")
+      .select("*")
+      .order("name");
 
-  if (error) console.error("Error fetching amenities:", error.message);
-  else setAmenities(data);
-};
-
+    if (error) console.error("Error fetching amenities:", error.message);
+    else setAmenities(data);
+  };
 
   useEffect(() => {
     if (!listingId) return;
     fetchListing(listingId);
     fetchAmenities();
-  }, []);
+  });
 
   if (loading) {
     return (
-      <div className="flex flex-1 items-center justify-center">
-        <LoaderCircle className="animate-spin w-8 h-8 text-orange-500" />
+      <div className="flex justify-center items-center mt-[220px] w-full">
+        <LoaderCircle className="animate-spin w-12 h-12 text-black" />
       </div>
     );
   }
@@ -389,7 +388,6 @@ function transformListing(data: any): ListingWithExtras {
       : [],
   };
 }
-
 
 /* ------------------- Small UI components ------------------- */
 function Input({

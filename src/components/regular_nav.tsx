@@ -13,7 +13,7 @@ export default function RegularNav() {
   const supabase = createClient();
   const router = useRouter();
   const pathname = usePathname();
-  const { isHost} = useSession();
+  const { profile, isHost} = useSession();
   const [drawerKey, setDrawerKey] = useState(0);
 
   const logout = async () => {
@@ -102,7 +102,7 @@ export default function RegularNav() {
               {/* Account links */}
               <div>
                 <ul className="space-y-2 text-lg">
-                  <li><Link href="/account">Minha conta</Link></li>
+                  <li><Link href={`/account/${profile?.profile_id}`}>Minha conta</Link></li>
                   <li><Link href="/help-center">Centro de ajuda</Link></li>
                   <li>
                     <button

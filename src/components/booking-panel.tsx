@@ -1,16 +1,14 @@
 "use client";
 
+import { Database } from "@/lib/supabase/models";
 import { HeartIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-interface BookingPanelProps {
-  listing_id: string;
-  listing_price: number;
-}
+type Listing = Database["public"]["Tables"]["listings"]["Row"];
 
-const BookingPanel = ({ listing_id, listing_price = 0 }: BookingPanelProps) => {
-  
+const BookingPanel = ({ listing}: {listing:Listing | null}) => {
+
   const [dates, setDates] = useState("Not selected");
   const [guests, setGuests] = useState("1");
 
@@ -20,7 +18,7 @@ const BookingPanel = ({ listing_id, listing_price = 0 }: BookingPanelProps) => {
         className="max-h-[calc(100vh-5rem)] overflow-y-auto sticky top-20 w-full flex flex-col gap-4 bg-white shadow-md p-4 border border-gray-200 rounded-lg z-20"
       >
         <div className="flex justify-between items-center">
-          <h2 className="font-semibold">AOA {listing_price}.00</h2>
+          <h2 className="font-semibold">AOA {listing?.base_price}.00</h2>
           <div>
             <button type="button">
               <HeartIcon />
@@ -43,9 +41,9 @@ const BookingPanel = ({ listing_id, listing_price = 0 }: BookingPanelProps) => {
 
         {/* payment summary placeholder */}
         {/* add conditional UI when dates are set */}
-        
+
         <Link
-          href={`/homes/${listing_id}/book?dates=${dates}&guests=${guests}`}
+          href={`/homes/${listing?.listing_id}/book?dates=${dates}&guests=${guests}`}
           className="w-full flex-1 text-center font-semibold bg-orange-300 p-4 rounded-lg"
         >
           Verificar disponibilidade

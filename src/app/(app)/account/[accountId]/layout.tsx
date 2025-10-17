@@ -2,35 +2,37 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { User, CreditCard, Lock, Bell, Settings } from "lucide-react";
+import { useSession } from "@/context/SessionContext";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const accountMenu = [
-    { name: "Informação pessoal", href: "/account/personal-info", icon: User },
+  const accountMenu = (id: string) => [
+    { name: "Informação pessoal", href: `/account/${id}/personal-info`, icon: User },
     {
       name: "Métodos de pagamento",
-      href: "/account/payment-method",
+      href: `/account/${id}/payment-method`,
       icon: CreditCard,
     },
     {
       name: "Login e Segurança",
-      href: "/account/login-and-security",
+      href: `/account/${id}/login-and-security`,
       icon: Lock,
     },
-    { name: "Notificações", href: "/account/notifications", icon: Bell },
+    { name: "Notificações", href: `/account/${id}/notifications`, icon: Bell },
   ];
 
   const pathname = usePathname();
+  const { profile } = useSession();
 
   return (
     <div className="min-h-screen bg-white flex justify-center">
       <div className="flex w-full max-w-6xl gap-12 px-6 py-12">
         {/* Sidebar */}
-        <aside className="hidden sticky top-27 lg:flex lg:flex-col w-80 h-fit px-6 py-8 bg-white border border-gray-200 rounded-2xl shadow-lg sticky top-10">
+        <aside className="hidden sticky top-27 lg:flex lg:flex-col w-80 h-fit px-6 py-8 bg-white border border-gray-200 rounded-2xl shadow-lg">
           <h2 className="text-lg font-semibold text-gray-800 mb-8">
             Minha Conta
           </h2>
           <ul className="space-y-2">
-            {accountMenu.map((item) => {
+            {accountMenu(profile?.profile_id).map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
               return (

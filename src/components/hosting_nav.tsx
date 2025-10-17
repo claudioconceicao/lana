@@ -113,7 +113,7 @@ const HostingNav = () => {
               <div>
                 <ul className="space-y-2 text-lg">
                   <li>
-                    <Link href="/account">Minha conta</Link>
+                    <Link href={`/account/${profile?.profile_id}`}>Minha conta</Link>
                   </li>
                   <li>
                     <Link href="/help-center">Centro de ajuda</Link>

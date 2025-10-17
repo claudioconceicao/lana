@@ -145,6 +145,7 @@ export default function HomePage() {
               <Image
                 src={image}
                 alt={city}
+                sizes="60vw"
                 fill
                 className="object-cover transition-transform duration-1000 ease-in-out group-hover:scale-105"
               />

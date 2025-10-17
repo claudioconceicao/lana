@@ -4,14 +4,12 @@ import CustomNavBar from "@/components/custom_navbar";
 import ImageGrid from "@/components/image-grid";
 import { CheckCircleIcon, LoaderCircle, StarIcon } from "lucide-react";
 import Link from "next/link";
-import RegularNav from "@/components/regular_nav";
-import { homedir } from "os";
-import React, { useRef, useEffect, useState } from "react";
+import React, { use, useRef, useEffect, useState, useCallback } from "react";
 import { createClient } from "../../../../lib/supabase/client";
 import { Database } from "../../../../lib/supabase/models";
+import { useParams } from "next/navigation";
 
-
-type Listing = Database['public']['Tables']['listings']['Row'];
+type Listing = Database["public"]["Tables"]["listings"]["Row"];
 type ListingWithExtras = Listing & {
   amenities: string[];
   images: string[];
@@ -23,7 +21,7 @@ type ListingWithExtras = Listing & {
   country?: { name: string } | null;
 };
 
-export default function ListingDetail({ params }: { params: Promise<{ homeId: string }> }){
+export default function ListingDetail() {
   const amenities = [
     "Wifi",
     "Kitchen",
@@ -37,29 +35,25 @@ export default function ListingDetail({ params }: { params: Promise<{ homeId: st
     "Hangers",
   ];
 
-  const {homeId} = React.use(params);
+  const { homeId } = useParams<{ homeId: string }>();
+
   const stopRef = useRef<HTMLDivElement | null>(null);
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
-
-  const listingId = homeId;
-
-  useEffect(() => {
-    if (!listingId) return;
-    fetchListing(listingId);
-  }, []);
+  const [amenitiesList, setAmenitiesList] = useState<string[]>([]);
 
   /**
    * Fetches full listing data including related tables
    */
-  const fetchListing = async (id: string) => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("listings")
-        .select(
-          `
+  const fetchListing = useCallback(
+    async (id: string) => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("listings")
+          .select(
+            `
             listing_id,
             title,
             name,
@@ -92,25 +86,37 @@ export default function ListingDetail({ params }: { params: Promise<{ homeId: st
               amenities(name)
             )
           `
-        )
-        .eq("listing_id", id)
-        .single();
+          )
+          .eq("listing_id", id)
+          .single();
 
-      if (error) throw error;
-      console.log("Fetched listing:", data);
-      const transformed = transformListing(data);
-      setListing(transformed);
-    } catch (err: any) {
-      console.error("Error fetching listing:", err.message || err);
-    } finally {
-      setLoading(false);
-    }
-  };
+        if (error) throw error;
+        console.log("Fetched listing:", data);
+        const transformed = transformListing(data);
+        setListing(transformed);
+        setAmenitiesList(transformed.amenities);
+      } catch (err: any) {
+        console.error("Error fetching listing:", err.message || err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [supabase]
+  );
+
+  useEffect(() => {
+    if (!homeId) return;
+    fetchListing(homeId);
+  }, [fetchListing, homeId]);
 
   if (loading) {
-    return <div className="flex flex-col items-center justify-center h-screen">
-      <LoaderCircle className="animate-spin mx-auto mt-8" size={48} />;
-    </div>
+    return (
+      <div className="flex h-screen">
+        <div className="absolute h-screen w-full inset-0 flex justify-center items-center bg-white/60 z-50">
+          <LoaderCircle className="animate-spin w-12 h-12" />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -131,26 +137,22 @@ export default function ListingDetail({ params }: { params: Promise<{ homeId: st
           <div>
             <h1 className="text-2xl font-semibold">{listing?.title}</h1>
             <p className="flex items-center">
-              {listing?.no_of_bedrooms} bedroom <span> &#160; &#8226; &#160;</span>
-              {listing?.no_of_beds} beds{" "}
-              <span>&#160; &#8226; &#160;</span>
+              {listing?.no_of_bedrooms} bedroom{" "}
+              <span> &#160; &#8226; &#160;</span>
+              {listing?.no_of_beds} beds <span>&#160; &#8226; &#160;</span>
               {listing?.no_of_bathrooms} bath
             </p>
           </div>
           <div className="mt-8">
             <p className="text-lg text-justify text-elipsis">
               {" "}
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus
-              voluptatibus iure expedita voluptatum itaque at necessitatibus
-              dignissimos assumenda, repellendus, officiis debitis. Numquam
-              voluptatem dignissimos mollitia, placeat autem ullam aliquid.
-              Dignissimos!
+              {listing?.description}
             </p>
           </div>
           <div id="amenities" className="mt-4">
             <h2 className="text-2xl font-semibold">O que este lugar oferece</h2>
             <div className="grid grid-cols-2 gap-3 mt-4">
-              {amenities.map((amenity) => (
+              {amenitiesList.map((amenity) => (
                 <div key={amenity} className="flex items-center">
                   <CheckCircleIcon size={16} />
                   <span className="px-2 py-1">{amenity}</span>
@@ -162,10 +164,7 @@ export default function ListingDetail({ params }: { params: Promise<{ homeId: st
             </button>
           </div>
         </div>
-        <BookingPanel
-          listing_id={listing?.listing_id as string}
-          listing_price={listing?.base_price || 0}
-        />
+        <BookingPanel listing={listing} />
       </div>
       <div ref={stopRef} id="location" className="mx-[150] mt-8">
         <h2 className="text-2xl font-semibold mt-4">Sobre a banda</h2>
@@ -186,10 +185,9 @@ export default function ListingDetail({ params }: { params: Promise<{ homeId: st
           <div className="flex-1">
             <h1 className="text-md font-semibold">Regras da casa</h1>
             <ul className="list-type-none mt-4 space-y-2">
-              <li>Maximo 8 pessoas</li>
+              <li>{listing?.max_guests} pessoas máximo</li>
               <li>No Parties</li>
               <li>No Smoking</li>
-              <li>2 Guests maximum</li>
             </ul>
             <button className="text-md underline font-semibold mt-2">
               Ver mais
@@ -198,8 +196,13 @@ export default function ListingDetail({ params }: { params: Promise<{ homeId: st
           <div className="flex-1">
             <h1 className="text-md font-semibold">Importante saber</h1>
             <ul className="list-type-none mt-4 space-y-2">
-              <li>Checkin: 2:00 PM - 6:00 PM</li>
-              <li>Checkout before 11:00 AM</li>
+              <li>
+                Checkin: {listing?.checkin_time_start} até{" "}
+                {listing?.checkin_time_end}
+              </li>
+              <li>Checkout antes de: {listing?.checkout_time}</li>
+              <li>Deposito: {listing?.deposit}</li>
+              <li>Minimo de noites: {listing?.min_stay}</li>
               <li></li>
             </ul>
             <button className="text-md underline font-semibold mt-2">
@@ -209,9 +212,11 @@ export default function ListingDetail({ params }: { params: Promise<{ homeId: st
           <div className="flex-1">
             <h1 className="text-md font-semibold">Política de cancelamento </h1>
             <ul className="list-type-none mt-4 space-y-2">
-              <li>Cancelamento gratuito até 48 horas antes do check-in</li>
-              <li>Após isso, cancelamento não é reembolsável</li>
-              <li>Review this Host&apos;s full policy for details.</li>
+              <li>Cancelamento gratuito até {48} horas antes do check-in</li>
+              <li>Após isso, reembolso de {0}%</li>
+              {/*   {listing?.policy_description && (
+                <li>{listing.policy_description}</li>
+              )} */}
             </ul>
             <button className="text-md underline font-semibold mt-2">
               Ver mais
@@ -261,8 +266,7 @@ export default function ListingDetail({ params }: { params: Promise<{ homeId: st
       </div>
     </div>
   );
-};
-
+}
 
 function transformListing(data: any): ListingWithExtras {
   return {

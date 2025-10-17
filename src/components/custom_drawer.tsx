@@ -1,18 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, UserCircleIcon, UserRound, X } from "lucide-react";
-import Link from "next/link";
+import { X } from "lucide-react";
 import { useSession } from "@/context/SessionContext";
-import { BsApple } from "react-icons/bs";
-import { FaFacebook } from "react-icons/fa6";
-import { FcGoogle } from "react-icons/fc";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { createClient } from "../lib/supabase/client";
-import { TbMenu3 } from "react-icons/tb";
+import { usePathname, useSearchParams } from "next/navigation";
 import MenuButton from "./menu_button";
-import LoginModal from "./login_modal";
-import RegisterModal from "./register_modal";
 import AuthModal from "./auth_modal";
 
 export default function CustomDrawer({

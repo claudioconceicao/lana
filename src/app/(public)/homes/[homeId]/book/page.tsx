@@ -1,36 +1,26 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import BookingSummary from "./booking_summary";
 import PaymentDetails from "./payment_details";
 import ConfirmButton from "./confirmation_button";
+import { createClient } from "@/lib/supabase/client";
+import { Database } from "@/lib/supabase/models";
 
 interface BookingPageProps {
-  params: { homeId: string };
+  params: { listing: Listing };
   searchParams?: { dates?: string; guests?: string };
 }
 
-export default function BookingPage({ params, searchParams }: BookingPageProps) {
-  const [dates, setDates] = useState(searchParams?.dates ?? "Not selected");
-  const [guests, setGuests] = useState(searchParams?.guests ?? "1");
+type Listing = Database["public"]["Tables"]["listings"]["Row"];
 
-  const listingId = params.homeId;
-  const [listing, setListing] = useState({
-    id: listingId,
-    title: "Beautiful Beach House",
-    image: "/placeholder.png",
-  });
+export default async function BookingPage({
+  params,
+  searchParams,
+}: BookingPageProps) {
+  const supabase = createClient();
+  const dates = searchParams?.dates ?? "Not selected";
+  const guests = searchParams?.guests ?? "1";
 
-  // If you want to fetch real listing from Supabase:
-  // useEffect(() => {
-  //   async function fetchListing() {
-  //     const { data } = await supabase.from("listings").select("*").eq("listing_id", listingId).single();
-  //     if (data) setListing({ id: data.listing_id, title: data.title, image: data.image_url || "/placeholder.png" });
-  //   }
-  //   fetchListing();
-  // }, [listingId]);
-
+  const listing = params.listing;
   return (
     <div className="mx-[150px] p-8">
       <h1 className="font-heading text-3xl mb-6 font-semibold">Reservar</h1>
@@ -59,7 +49,8 @@ function CancelPolicy() {
     <div className="border rounded-lg p-4 shadow-sm">
       <h2 className="font-semibold mb-3 text-xl">Política de cancelamento</h2>
       <p className="text-sm text-gray-600">
-        Cancelamentos feitos até <strong>48h antes</strong> do check-in recebem reembolso total. Após esse prazo, pode haver taxa de cancelamento.
+        Cancelamentos feitos até <strong>48h antes</strong> do check-in recebem
+        reembolso total. Após esse prazo, pode haver taxa de cancelamento.
       </p>
     </div>
   );
@@ -79,14 +70,24 @@ function HouseRules() {
   );
 }
 
-function ListingSummary({ listing }: { listing: { id: string; title: string; image: string } }) {
+function ListingSummary({
+  listing,
+}: {
+  listing: Listing;
+}) {
   return (
     <div className="border w-full rounded-lg p-4 shadow-sm">
       <div className="flex flex-row gap-4 items-center">
-        <Image src={listing.image} width={80} height={80} alt={listing.title} className="rounded-lg object-cover" />
+        <Image
+          src={"/images/luanda_sky.png"}
+          width={80}
+          height={80}
+          alt={"cover image"}
+          className="rounded-lg object-cover"
+        />
         <div>
           <h2 className="font-semibold">{listing.title}</h2>
-          <p className="text-sm text-gray-500">Listing ID: {listing.id}</p>
+          <p className="text-sm text-gray-500">Listing ID: {listing.listing_id}</p>
         </div>
       </div>
     </div>

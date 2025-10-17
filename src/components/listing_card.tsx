@@ -46,74 +46,61 @@ export default function ListingCard({
 
     const newLiked = !liked;
     setLiked(newLiked);
+    setLoading(true);
 
-    if (newLiked) {
-      // Add to wishlist
-      const { data, error } = await supabase.from("wishlists").insert([
-        {
-          listing_id: listing.listing_id,
-          user_id: user_id,
-        },
-      ]);
+    try {
+      if (newLiked) {
+        const { error } = await supabase
+          .from("wishlists")
+          .insert([{ listing_id: listing.listing_id, user_id }]);
+        if (error) throw error;
 
-      if (error) {
-        console.error("Error adding to wishlist:", JSON.stringify(error, null, 2));
-        setLiked(false);
-        return;
-      }
-
-      // Create notification
-      const { error: notifError } = await supabase
-        .from("notifications")
-        .insert([
+        await supabase.from("notifications").insert([
           {
-            user_id: user_id,
+            user_id,
             type: "wishlist",
             message: `Você adicionou ${listing.title} à sua lista de desejos.`,
             listing_id: listing.listing_id,
           },
         ]);
-
-      if (notifError) {
-        console.error("Error adding notification:", notifError);
+      } else {
+        const { error } = await supabase
+          .from("wishlists")
+          .delete()
+          .match({ listing_id: listing.listing_id, user_id });
+        if (error) throw error;
       }
-    } else {
-      // Remove from wishlist
-      const { error } = await supabase
-        .from("wishlists")
-        .delete()
-        .match({ listing_id: listing.listing_id, user_id });
-
-      if (error) {
-        console.error("Error removing from wishlist:", error);
-        setLiked(true);
-      }
+    } catch (err) {
+      console.error("Error toggling wishlist:", err);
+      setLiked(!newLiked); // revert like state
+    } finally {
+      setLoading(false);
     }
   };
 
-  const reviews = listing?.bookings?.flatMap((b) => b.reviews ?? []) ?? [];
-  const avgRating =
-    reviews.length > 0
-      ? (
-          reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-        ).toFixed(1)
-      : "N/A";
+  const reviews = listing.bookings?.flatMap((b) => b.reviews ?? []) ?? [];
+  const avgRating = reviews.length
+    ? (
+        reviews.reduce((s, r) => s + (r.rating ?? 0), 0) / reviews.length
+      ).toFixed(1)
+    : null;
+
+  const handleCardClick = () => {
+    router.push(`/homes/${listing?.listing_id}`);
+  };
 
   return (
-    <div className="w-full sm:max-w-sm rounded-xl bg-white overflow-hidden shadow-sm hover:shadow-md transition">
+    <div
+      className="w-full sm:max-w-sm rounded-xl bg-white overflow-hidden shadow-sm hover:shadow-md transition"
+      onClick={handleCardClick}
+    >
       {/* Image Carousel */}
-      <div
-        className="w-full h-64 cursor-pointer"
-        onClick={() => router.push(`/homes/${listing?.listing_id}`)}
-      >
+      <div className="w-full h-64 cursor-pointer">
         <ImageCarousel images={images} />
       </div>
 
       {/* Card Content */}
-      <div
-        className="py-3 flex flex-col gap-2 cursor-pointer"
-        onClick={() => router.push(`/homes/${listing?.listing_id}`)}
-      >
+      <div className="px-2 py-3 flex flex-col gap-2 cursor-pointer">
         <div className="flex justify-between items-start">
           <div>
             <h2 className="font-heading text-lg font-semibold text-gray-900">
@@ -142,8 +129,9 @@ export default function ListingCard({
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center gap-1 text-yellow-500 text-sm">
             <FaStar className="w-4 h-4" />
-            <span>{avgRating}</span>
+            <span>{avgRating ?? "N/A"}</span>
           </div>
+
           <p className="font-medium text-gray-900 text-sm">
             {listing?.base_price ?? "5000"}{" "}
             <span className="text-gray-500">Kz / noite</span>
@@ -153,4 +141,3 @@ export default function ListingCard({
     </div>
   );
 }
-
