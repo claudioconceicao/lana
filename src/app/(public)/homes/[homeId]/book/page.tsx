@@ -1,6 +1,5 @@
 import BookingClient from "./booking_listing";
 
-// ✅ Generate static paths for GitHub Pages
 export async function generateStaticParams() {
   // Replace with your own data or hardcoded IDs
   return [
