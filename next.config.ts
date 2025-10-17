@@ -1,7 +1,8 @@
-/** @type {import('next').NextConfig} */
+import { netlifyPlugin } from "@netlify/next";
 
 
 const nextConfig = {
+  
   reactStrictMode: true,
   images: {
     remotePatterns: [
@@ -13,4 +14,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default netlifyPlugin(nextConfig);
