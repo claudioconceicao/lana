@@ -12,11 +12,9 @@ import { LoaderCircle } from "lucide-react";
 
 type Listing = Database["public"]["Tables"]["listings"]["Row"];
 interface BookingPageProps {
-  params: { listing: Listing };
   searchParams?: { startDate?: string; endDate?: string; guests?: string };
 }
 export default function BookingPage({
-  params,
   searchParams,
 }: BookingPageProps) {
   const supabase = createClient();
