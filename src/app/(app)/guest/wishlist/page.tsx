@@ -6,11 +6,11 @@ import { Database } from "../../../../lib/supabase/models";
 import ListingCard from "@/components/listing_card";
 import { sanitizeNulls } from "@/utils/sanitize"; // ✅ add this line
 
-type ListingRow = Database["public"]["Tables"]["listings"]["Row"];
+type Listing = Database["public"]["Tables"]["listings"]["Row"];
 type WishlistRow = Database["public"]["Tables"]["wishlists"]["Row"];
 
 interface WishlistItem extends WishlistRow {
-  listing: ListingRow | null;
+  listing: Listing | null;
 }
 
 interface ListingProp {
@@ -26,10 +26,20 @@ interface ListingProp {
     bookings?: { reviews?: { rating: number }[] }[];
   };
 
+  type ListingWithRelations = Listing & {
+    listing_images?: Database["public"]["Tables"]["listing_images"]["Row"][];
+    accommodation_type?: Database["public"]["Tables"]["accommodation_types"]["Row"];
+    province?: Database["public"]["Tables"]["provinces"]["Row"];
+    bookings?: (Database["public"]["Tables"]["bookings"]["Row"] & {
+      reviews?: Database["public"]["Tables"]["reviews"]["Row"][];
+    })[];
+    amenities?: Database["public"]["Tables"]["amenities"]["Row"][];
+  };
+
 const Wishlist = () => {
   const [loading, setLoading] = useState(false);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
-  const [listings, setListings] = useState<ListingProp[]>([]);
+  const [listings, setListings] = useState<ListingWithRelations[]>([]);
   useEffect(() => {
     const supabase = createClient();
 
@@ -61,12 +71,12 @@ const Wishlist = () => {
         console.error("Error fetching wishlist:", error);
         setWishlist([]);
       } else {
-        const formatted = (data || []).map((item: any) => ({
+          const formatted = (data || []).map((item: any) => ({
           ...item,
-          listing: item.listings ? sanitizeNulls(item.listings) : null, 
+          listing: item.listings ? sanitizeNulls(item.listings) : null,
         }));
         setWishlist(formatted);
-        setListings(formatted.map(item => item.listing).filter(Boolean) as ListingProp[]);
+        setListings(formatted.map(item => item.listing).filter(Boolean) as ListingWithRelations[]);
       }
 
       setLoading(false);
