@@ -3,51 +3,53 @@
 import { ImageCarousel } from "./image_carousel";
 import { FaStar, FaHeart, FaRegHeart } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { createClient } from "../lib/supabase/client";
 import { useSession } from "@/context/SessionContext";
+import { Database } from "@/lib/supabase/models";
 
-interface ListingCardProps {
-  listing: {
-    listing_id: string | null;
-    title?: string | null;
-    base_price?: number | null;
-    location?: string | null;
-    province?: { name: string | null };
-    max_guests?: number | null;
-    no_of_beds?: number | null;
-    accommodation_type?: { name: string };
-    listing_images?: { image_url: string }[];
-    bookings?: { reviews?: { rating: number }[] }[];
-  };
-  initiallyLiked?: boolean;
-}
+type Listing = Database["public"]["Tables"]["listings"]["Row"];
+type ListingWithRelations = Listing & {
+  listing_images?: Database["public"]["Tables"]["listing_images"]["Row"][];
+  accommodation_type?: Database["public"]["Tables"]["accommodation_types"]["Row"];
+  province?: Database["public"]["Tables"]["provinces"]["Row"];
+  bookings?: (Database["public"]["Tables"]["bookings"]["Row"] & {
+    reviews?: Database["public"]["Tables"]["reviews"]["Row"][];
+  })[];
+  amenities?: Database["public"]["Tables"]["amenities"]["Row"][];
+};
 
 export default function ListingCard({
   listing,
   initiallyLiked = false,
-}: ListingCardProps) {
+}: {
+  listing: ListingWithRelations;
+  initiallyLiked?: boolean;
+}) {
   const router = useRouter();
-  const [supabase, setSupabase] = useState<any>(null);
+  const supabase = createClient();
   const { profile } = useSession();
   const [liked, setLiked] = useState(initiallyLiked);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    setSupabase(createClient());
-  }, []);
-
-  useEffect(() => {
-    setLiked(initiallyLiked);
-  }, [initiallyLiked]);
-
-  if (!supabase) return null;
+  const avgRating = useMemo(() => {
+    const reviews = listing.bookings?.flatMap((b) => b.reviews ?? []) ?? [];
+    if (reviews.length === 0) return "N/A";
+    return (
+      reviews.reduce((s, r) => s + (r.rating ?? 0), 0) / reviews.length
+    ).toFixed(1);
+  }, [listing.bookings]);
 
   const toggleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (loading || !profile?.profile_id) return;
-    const user_id = profile.profile_id;
 
+    if (loading) return;
+    if (!profile?.profile_id) {
+      router.push("/login");
+      return;
+    }
+
+    const user_id = profile.profile_id;
     const newLiked = !liked;
     setLiked(newLiked);
     setLoading(true);
@@ -76,23 +78,13 @@ export default function ListingCard({
       }
     } catch (err) {
       console.error("Error toggling wishlist:", err);
-      setLiked(!newLiked);
+      setLiked((prev) => !prev);
     } finally {
       setLoading(false);
     }
   };
 
-  const reviews = listing.bookings?.flatMap((b) => b.reviews ?? []) ?? [];
-  const avgRating =
-    reviews.length > 0
-      ? (
-          reviews.reduce((s, r) => s + (r.rating ?? 0), 0) / reviews.length
-        ).toFixed(1)
-      : "N/A";
-
-  const handleCardClick = () => {
-    router.push(`/homes/${listing?.listing_id}`);
-  };
+  const handleCardClick = () => router.push(`/homes/${listing.listing_id}`);
 
   return (
     <div
@@ -114,7 +106,7 @@ export default function ListingCard({
       <div className="px-2 flex flex-col gap-2 cursor-pointer">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1 max-w-[70%]">
-            <h2 className="font-heading text-lg font-semibold text-gray-900 text-nowrap subpixel-antialiased text-ellipsis overflow-hidden">
+            <h2 className="font-heading text-lg font-semibold text-gray-900 truncate">
               {listing?.accommodation_type?.name} em{" "}
               {listing?.province?.name || "Título do Imóvel"}
             </h2>
@@ -124,7 +116,7 @@ export default function ListingCard({
           </div>
 
           <button
-            onClick={(e) => toggleLike(e)}
+            onClick={toggleLike}
             disabled={loading}
             className={`rounded-full p-2 hover:bg-gray-100 ${
               loading ? "opacity-50 cursor-not-allowed" : ""
@@ -141,7 +133,7 @@ export default function ListingCard({
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center gap-1 text-yellow-500 text-sm">
             <FaStar className="w-4 h-4" />
-            <span>{avgRating}</span>
+            <span>{avgRating === "N/A" ? "Sem avaliações" : avgRating}</span>
           </div>
 
           <p className="font-medium text-gray-900 text-sm">

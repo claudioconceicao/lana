@@ -5,20 +5,20 @@ import { User, CreditCard, Lock, Bell, Settings } from "lucide-react";
 import { useSession } from "@/context/SessionContext";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const accountMenu = (id: string) => [
-    { name: "Informação pessoal", href: `/account/${id}/personal-info`, icon: User },
+  const accountMenu = [
+    { name: "Informação pessoal", href: `/account/personal-info`, icon: User },
     {
       name: "Métodos de pagamento",
-      href: `/account/${id}/payment-method`,
+      href: `/account/payment-method`,
       icon: CreditCard,
     },
-    
+
     {
       name: "Login e Segurança",
-      href: `/account/${id}/login-and-security`,
+      href: `/account/login-and-security`,
       icon: Lock,
     },
-    { name: "Notificações", href: `/account/${id}/notifications`, icon: Bell },
+    { name: "Notificações", href: `/account/notifications`, icon: Bell },
   ];
 
   const pathname = usePathname();
@@ -33,7 +33,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             Minha Conta
           </h2>
           <ul className="space-y-2">
-            {accountMenu(profile?.profile_id).map((item) => {
+            {accountMenu.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
               return (

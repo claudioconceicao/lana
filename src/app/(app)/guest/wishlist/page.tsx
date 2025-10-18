@@ -85,7 +85,7 @@ const Wishlist = () => {
 
   return (
     <div className="flex justify-center min-h-[calc(100vh-80px)]">
-      <div className="w-full h-full border border-gray-300 mx-[50px] mt-[30px] px-[50px] py-8">
+      <div className="w-full h-full  mx-[50px] mt-[30px] px-[50px] py-8">
         <h1 className="text-3xl font-semibold mb-6">Favoritos</h1>
 
         {wishlist.length === 0 ? (

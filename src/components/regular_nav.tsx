@@ -62,7 +62,7 @@ export default function RegularNav() {
         <div className="flex gap-4 items-center">
           <Link
             href={isHost ? "/hosting" : "/become-a-host"}
-            className="block rounded-md px-3 py-2 transition-colors duration-200 text-black hover:bg-gray-100 whitespace-nowrap"
+            className="block xs:hidden sm:hidden md:block rounded-md px-3 py-2 transition-colors duration-200 text-black hover:bg-gray-100 whitespace-nowrap"
           >
             <div className="uppercase text-xs font-semibold">
               {isHost ? "Modo anfitrião" : "Anuncie aqui a sua casa"}

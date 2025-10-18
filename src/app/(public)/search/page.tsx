@@ -5,6 +5,7 @@ import ListingCard from "@/components/listing_card";
 import SearchBox from "@/components/search_box";
 import { dummy } from "@/database/dummy_data";
 import { Database } from "../../../lib/supabase/models";
+import { sanitizeNulls } from "@/utils/sanitize";
 
 // ✅ Add minimal typing for clarity
 type Listing = Database["public"]["Tables"]["listings"]["Row"];
@@ -68,7 +69,7 @@ export default function SearchPage() {
 
           <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
             {paginatedListings.map((listing) => (
-              <ListingCard key={listing.listing_id} listing={listing} />
+              <ListingCard key={listing.listing_id} listing={sanitizeNulls(listing)} />
             ))}
           </div>
 

@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { X, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "../lib/supabase/client";
 import AuthButton from "./authButton";
@@ -20,11 +20,18 @@ export default function LoginModal({
   const supabase = createClient();
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const [errorMsg, setErrorMsg] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"email" | "password">("email");
+
+  const passwordRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (step === "password") passwordRef.current?.focus();
+  }, [step]);
 
   // Auth handler
   const handleAuth = async (e: React.FormEvent) => {
@@ -39,9 +46,14 @@ export default function LoginModal({
 
     setLoading(false);
     if (error) {
-      setErrorMsg(error.message);
+      if (error.message.includes("Invalid login credentials")) {
+        setErrorMsg("Email ou password incorretos.");
+      } else {
+        setErrorMsg(error.message);
+      }
       return;
     }
+
     const redirectTo = searchParams.get("redirect") || "/";
     router.push(redirectTo);
   };
@@ -50,33 +62,41 @@ export default function LoginModal({
     setLoading(true);
     setErrorMsg("");
 
-    const { data, error } = await supabase.rpc("check_user_exists", {
-      user_email: email,
-    });
+    try {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw new Error("Digite um email válido.");
+      }
 
-    if (error) {
-      setErrorMsg("Erro ao verificar o email.");
+      const { data, error } = await supabase.rpc("check_user_exists", {
+        user_email: email,
+      });
+
+      if (error) throw new Error("Erro ao verificar o email.");
+
+      if (data) {
+        setStep("password");
+      } else {
+        onSwitch(); // Switch to register modal if user not found
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || "Ocorreu um erro inesperado.");
+    } finally {
       setLoading(false);
-      return;
     }
-    if (data) {
-      setStep("password");
-    } else {
-      setLoading(false);
-      onSwitch();
-    }
-    setLoading(false);
   };
 
   return (
     <div>
       <h1 className="text-2xl text-black font-medium">Login</h1>
-      <p className="text-lg text-gray-500 mt-2">Bem vindo de volta</p>
+      <p className="text-lg text-gray-500 mt-2">Bem-vindo de volta</p>
 
       <form
         className="mt-6"
         autoComplete="off"
-        onSubmit={step === "password" ? handleAuth : (e) => e.preventDefault()}
+        onSubmit={step === "password" ? handleAuth : (e) => {
+          e.preventDefault();
+          handleNextStep();
+        }}
       >
         <div className="flex flex-col gap-3">
           {/* Email */}
@@ -105,6 +125,7 @@ export default function LoginModal({
                 className="flex flex-col gap-2"
               >
                 <input
+                  ref={passwordRef}
                   type="password"
                   placeholder="Password"
                   value={password}
@@ -125,26 +146,22 @@ export default function LoginModal({
           </AnimatePresence>
 
           {/* Buttons */}
-          {step === "email" ? (
-            <button
-              type="button"
-              onClick={handleNextStep}
-              disabled={loading}
-              className="h-11 mt-2 bg-black text-white rounded font-medium flex items-center justify-center disabled:opacity-70"
-            >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Próximo"}
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={loading}
-              className="h-11 mt-2 bg-black text-white rounded font-medium flex items-center justify-center disabled:opacity-70"
-            >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Login"}
-            </button>
-          )}
+          <button
+            type={step === "password" ? "submit" : "button"}
+            onClick={step === "password" ? undefined : handleNextStep}
+            disabled={loading}
+            className="h-11 mt-2 bg-black text-white rounded font-medium flex items-center justify-center disabled:opacity-70"
+          >
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : step === "password" ? (
+              "Login"
+            ) : (
+              "Próximo"
+            )}
+          </button>
 
-          {errorMsg && <p className="text-red-500">{errorMsg}</p>}
+          {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
         </div>
       </form>
 
@@ -159,6 +176,20 @@ export default function LoginModal({
         <AuthButton href="#" icon={<FaFacebook className="w-10 h-10" />} />
         <AuthButton href="#" icon={<FcGoogle className="w-10 h-10" />} />
         <AuthButton href="#" icon={<BsApple className="w-10 h-10" />} />
+      </div>
+
+      {/* Register toggle */}
+      <div className="mt-6 text-center text-sm text-gray-600">
+        <p>
+          Não tem uma conta?{" "}
+          <button
+            type="button"
+            onClick={onSwitch}
+            className="text-black font-medium hover:underline"
+          >
+            Criar conta
+          </button>
+        </p>
       </div>
     </div>
   );

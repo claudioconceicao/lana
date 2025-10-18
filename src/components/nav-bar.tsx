@@ -73,7 +73,7 @@ export default function Navbar({isHost}:{isHost:boolean}) {
           {/* Host Link */}
           <Link
             href={isHost ? "/hosting" : "/become-a-host"}
-            className={`block rounded-md px-3 py-2 text-xs font-semibold uppercase transition-colors duration-200 ${
+            className={`block xs:hidden sm:hidden md:block rounded-md px-3 py-2 text-xs font-semibold uppercase transition-colors duration-200 ${
               isScrolled
                 ? "text-black hover:bg-gray-100"
                 : "text-white hover:bg-white/10"
@@ -85,7 +85,7 @@ export default function Navbar({isHost}:{isHost:boolean}) {
           {/* Language & Currency */}
           <button
             onClick={() => setOpenDialog(true)}
-            className={`flex items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold uppercase transition-colors duration-200 ${
+            className={`sm:hidden md:hidden xs:hidden flex items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold uppercase transition-colors duration-200 ${
               isScrolled
                 ? "text-black hover:bg-gray-100"
                 : "text-white hover:bg-white/10"
@@ -168,7 +168,7 @@ export default function Navbar({isHost}:{isHost:boolean}) {
               <div>
                 <ul className="space-y-2 text-lg">
                   <li>
-                    <Link href={`/account/${profile?.profile_id}`}>Minha conta</Link>
+                    <Link href={`/account`}>Minha conta</Link>
                   </li>
                   <li>
                     <Link href="/help-center">Centro de ajuda</Link>
