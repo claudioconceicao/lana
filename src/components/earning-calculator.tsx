@@ -32,7 +32,7 @@ export default function EarningCalculator() {
           <select
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 mb-6 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full border rounded-lg px-3 py-2 mb-6 focus:outline-none focus:ring-2 focus:ring-black"
           >
             {Object.keys(cityRates).map((c) => (
               <option key={c} value={c}>
@@ -51,7 +51,7 @@ export default function EarningCalculator() {
               max={30}
               value={nights}
               onChange={(e) => setNights(Number(e.target.value))}
-              className="w-full accent-orange-600 cursor-pointer"
+              className="w-full accent-black cursor-pointer"
             />
             <span className="font-semibold text-gray-800 w-10 text-right">
               {nights}
@@ -61,9 +61,9 @@ export default function EarningCalculator() {
       </div>
 
       {/* Resultado grande */}
-      <div className="flex flex-1 flex-col w-full justify-center items-center text-center bg-orange-50 rounded-xl p-6">
+      <div className="flex flex-1 flex-col w-full justify-center items-center text-center rounded-xl p-6">
         <span className="text-gray-600 text-sm">Ganhos estimados</span>
-        <span className="text-3xl md:text-4xl font-bold text-orange-600 mt-2">
+        <span className="text-3xl md:text-4xl font-bold text-black mt-2 text-nowrap">
           {estimated.toLocaleString("pt-PT")} Kz
         </span>
         <span className="text-gray-500 text-xs mt-1">/mês</span>

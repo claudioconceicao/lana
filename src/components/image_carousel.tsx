@@ -27,7 +27,7 @@ export function ImageCarousel({ images, className }: CarouselProps) {
   return (
    <div
   className={cn(
-    "relative w-full aspect-[4/3] sm:aspect-[5/4] md:aspect-[3/2] overflow-hidden rounded-xl",
+    "relative w-full aspect-[4/3] sm:aspect-[5/4] md:aspect-[3/2] overflow-hidden rounded-tl-xl rounded-tr-xl",
     className
   )}
 >

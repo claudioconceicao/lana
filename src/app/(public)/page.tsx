@@ -63,7 +63,11 @@ export default function HomePage() {
     listing_id,
     title,
     base_price,
+    no_of_beds,
+    max_guests,
     property_types(name),
+    province:provinces(name),
+    accommodation_type:accommodation_types(name),
     listing_amenities (
       amenity_id,
       amenities(name)
