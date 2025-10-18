@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "../../../../lib/supabase/client";
 import { Database } from "../../../../lib/supabase/models";
 import ListingCard from "@/components/listing_card";
+import { sanitizeNulls } from "@/utils/sanitize"; // ✅ add this line
 
 type ListingRow = Database["public"]["Tables"]["listings"]["Row"];
 type WishlistRow = Database["public"]["Tables"]["wishlists"]["Row"];
@@ -12,10 +13,23 @@ interface WishlistItem extends WishlistRow {
   listing: ListingRow | null;
 }
 
+interface ListingProp {
+    listing_id: string | null;
+    title?: string | null;
+    base_price?: number | null;
+    location?: string | null;
+    province?: { name: string | null };
+    max_guests?: number | null;
+    no_of_beds?: number | null;
+    accommodation_type?: { name: string };
+    listing_images?: { image_url: string }[];
+    bookings?: { reviews?: { rating: number }[] }[];
+  };
+
 const Wishlist = () => {
   const [loading, setLoading] = useState(false);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
-
+  const [listings, setListings] = useState<ListingProp[]>([]);
   useEffect(() => {
     const supabase = createClient();
 
@@ -32,30 +46,27 @@ const Wishlist = () => {
         return;
       }
 
-      // ✅ Correct join syntax
       const { data, error } = await supabase
         .from("wishlists")
-        .select(
-          `
+        .select(`
           wishlist_id,
           user_id,
           listing_id,
           created_at,
           listings (*)
-        `
-        )
+        `)
         .eq("user_id", session.user.id);
 
       if (error) {
         console.error("Error fetching wishlist:", error);
         setWishlist([]);
       } else {
-        // Supabase returns "listings" (not "listing") as a nested object
         const formatted = (data || []).map((item: any) => ({
           ...item,
-          listing: item.listings ?? null,
+          listing: item.listings ? sanitizeNulls(item.listings) : null, 
         }));
         setWishlist(formatted);
+        setListings(formatted.map(item => item.listing).filter(Boolean) as ListingProp[]);
       }
 
       setLoading(false);
@@ -83,8 +94,7 @@ const Wishlist = () => {
               A sua lista de favoritos está vazia.
             </p>
             <p className="text-sm">
-              Adicione casas, apartamentos ou locais aos favoritos para vê-los
-              aqui.
+              Adicione casas, apartamentos ou locais aos favoritos para vê-los aqui.
             </p>
             <button className="mt-6 px-6 py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition">
               Explorar Acomodações
@@ -92,12 +102,14 @@ const Wishlist = () => {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {wishlist.map(
-              (item) =>
-                item.listing && (
-                  <ListingCard key={item.listing.listing_id} listing={item.listing} initiallyLiked />
-                )
-            )}
+            {listings.map(
+              (item) => (
+                  <ListingCard
+                    key={item.listing_id}
+                    listing={item}
+                    initiallyLiked
+                  />
+            ))}
           </div>
         )}
       </div>

@@ -131,7 +131,7 @@ export default function ListingDetail() {
           ]}
         />
       </div>
-      <CustomNavBar />
+      <CustomNavBar basePrice={listing?.base_price!} />
       <div className="relative grid grid-cols-3 gap-8 mx-[150] mt-8">
         <div id="description" className="col-span-2 max-w-[600px]">
           <div>

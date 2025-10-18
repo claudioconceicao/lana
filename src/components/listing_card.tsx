@@ -9,13 +9,13 @@ import { useSession } from "@/context/SessionContext";
 
 interface ListingCardProps {
   listing: {
-    listing_id: string;
-    title?: string;
-    base_price?: number;
-    location?: string;
-    province?: { name: string };
-    max_guests?: number;
-    no_of_beds?: number;
+    listing_id: string | null;
+    title?: string | null;
+    base_price?: number | null;
+    location?: string | null;
+    province?: { name: string | null };
+    max_guests?: number | null;
+    no_of_beds?: number | null;
     accommodation_type?: { name: string };
     listing_images?: { image_url: string }[];
     bookings?: { reviews?: { rating: number }[] }[];
@@ -41,7 +41,7 @@ export default function ListingCard({
     setLiked(initiallyLiked);
   }, [initiallyLiked]);
 
-  if (!supabase) return null; // ✅ prevents SSR crash
+  if (!supabase) return null;
 
   const toggleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();

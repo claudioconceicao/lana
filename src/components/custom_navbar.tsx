@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const CustomNavBar = () => {
+const CustomNavBar = ({basePrice}:{basePrice:number}) => {
   const links = [
     { label: "Fotos", target: "images" },
     { label: "Descrição", target: "description" },
